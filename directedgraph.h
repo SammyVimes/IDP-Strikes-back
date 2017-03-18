@@ -7,17 +7,26 @@ template <class V>
 class DirectedGraph
 {
 public:
-    DirectedGraph();
+
+    DirectedGraph() {
+
+    }
+
+    ~DirectedGraph() {
+        std::for_each(firstNodes.begin(), firstNodes.end(), [](Node* node) {
+           delete node;
+        });
+    }
 
     class Node {
     public:
 
-        Node(V& value) {
+        Node(const V& value) {
             this->value = value;
         }
 
         ~Node() {
-            std::for_each(nodes.begin(), nodes.end(), [](Node* node) {
+            std::for_each(outgoingNodes.begin(), outgoingNodes.end(), [](Node* node) {
                delete node;
             });
         }
@@ -52,7 +61,7 @@ public:
 
     };
 
-    void addNode(Node* from, V& value) {
+    void addNode(Node* from, const V& value) {
         Node* n = new Node(value);
         from->addOutgoingNode(n);
     }
@@ -64,9 +73,13 @@ public:
         nodeFrom->addOutgoingNode(nodeTo);
     }
 
-    void addNode(V& value) {
+    void addNode(const V& value) {
         Node* n = new Node(value);
         this->firstNodes.push_back(n);
+    }
+
+    std::vector<Node*> getFirstNodes() {
+        return firstNodes;
     }
 
 private:
