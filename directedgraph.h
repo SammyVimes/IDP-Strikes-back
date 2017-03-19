@@ -3,6 +3,24 @@
 
 #include <vector>
 
+class BadGraphException {
+
+private:
+
+    std::string message;
+
+public:
+
+    BadGraphException(std::string message) {
+        this->message = message;
+    }
+
+    std::string getMessage() {
+        return message;
+    }
+
+};
+
 template <class V>
 class DirectedGraph
 {
@@ -19,10 +37,14 @@ public:
     }
 
     class Node {
+
+        friend class DirectedGraph;
+
     public:
 
-        Node(const V& value) {
+        Node(DirectedGraph* graph, const V& value) {
             this->value = value;
+            this->graph = graph;
         }
 
         ~Node() {
@@ -31,20 +53,12 @@ public:
             });
         }
 
-        void addOutgoingNode(Node* node) {
-            node->hasPredecessors = true;
-            outgoingNodes.push_back(node);
-        }
-
-        void addOutgoingNodes(DirectedGraph& graph, std::vector<Node*> nodes) {
-            std::for_each(nodes.begin(), nodes.end(), [](Node* node) {
-                node->hasPredecessors = true;
-            });
-            outgoingNodes.insert(outgoingNodes.end(), nodes.begin(), nodes.end());
-        }
-
         V getValue() {
             return this->value;
+        }
+
+        DirectedGraph* getGraph() {
+            return graph;
         }
 
         std::vector<Node*> getOutgoingNodes() {
@@ -55,26 +69,52 @@ public:
 
         bool hasPredecessors = false;
 
+        DirectedGraph* graph;
+
         V value;
 
         std::vector<Node*> outgoingNodes;
 
+        void addOutgoingNode(Node* node) {
+            node->hasPredecessors = true;
+            outgoingNodes.push_back(node);
+        }
+
+        void addOutgoingNodes(std::vector<Node*> nodes) {
+            std::for_each(nodes.begin(), nodes.end(), [](Node* node) {
+                node->hasPredecessors = true;
+            });
+            outgoingNodes.insert(outgoingNodes.end(), nodes.begin(), nodes.end());
+        }
+
     };
 
-    void addNode(Node* from, const V& value) {
-        Node* n = new Node(value);
+    void addNode(Node* from, const V& value) throw(BadGraphException) {
+        if (from->getGraph() != this) {
+            throw BadGraphException("Node 'from' doesn't belong to this graph");
+        }
+
+        Node* n = new Node(this, value);
         from->addOutgoingNode(n);
     }
 
     void linkNodes(Node* nodeFrom, Node* nodeTo) {
-        if (nodeFrom->hasPredecessors) {
+        if (nodeFrom->getGraph() != this) {
+            throw BadGraphException("Node 'from' doesn't belong to this graph");
+        }
+        if (nodeTo->getGraph() != this) {
+            throw BadGraphException("Node 'to' doesn't belong to this graph");
+        }
+
+        if (!nodeFrom->hasPredecessors) {
             firstNodes.erase(std::remove(firstNodes.begin(), firstNodes.end(), nodeFrom), firstNodes.end());
         }
+
         nodeFrom->addOutgoingNode(nodeTo);
     }
 
     void addNode(const V& value) {
-        Node* n = new Node(value);
+        Node* n = new Node(this, value);
         this->firstNodes.push_back(n);
     }
 
