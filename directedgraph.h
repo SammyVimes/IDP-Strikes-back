@@ -67,8 +67,6 @@ public:
 
     private:
 
-        bool hasPredecessors = false;
-
         DirectedGraph* graph;
 
         V value;
@@ -76,14 +74,10 @@ public:
         std::vector<Node*> outgoingNodes;
 
         void addOutgoingNode(Node* node) {
-            node->hasPredecessors = true;
             outgoingNodes.push_back(node);
         }
 
         void addOutgoingNodes(std::vector<Node*> nodes) {
-            std::for_each(nodes.begin(), nodes.end(), [](Node* node) {
-                node->hasPredecessors = true;
-            });
             outgoingNodes.insert(outgoingNodes.end(), nodes.begin(), nodes.end());
         }
 
@@ -104,10 +98,6 @@ public:
         }
         if (nodeTo->getGraph() != this) {
             throw BadGraphException("Node 'to' doesn't belong to this graph");
-        }
-
-        if (!nodeFrom->hasPredecessors) {
-            firstNodes.erase(std::remove(firstNodes.begin(), firstNodes.end(), nodeFrom), firstNodes.end());
         }
 
         nodeFrom->addOutgoingNode(nodeTo);
