@@ -17,6 +17,7 @@ public:
 
 private:
     int type;
+
 };
 
 #endif // DFDELEMENT_H

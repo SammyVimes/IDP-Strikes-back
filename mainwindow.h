@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QGraphicsView>
+#include <map>
+#include "displayabledfdelement.h"
 #include "directedgraph.h"
 #include "dfdelement.h"
 

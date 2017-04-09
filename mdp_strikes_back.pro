@@ -16,14 +16,14 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    dotgenerator.cpp \
     dfdelement.cpp \
-    exception.cpp
+    exception.cpp \
+    displayabledfdelement.cpp
 
 HEADERS  += mainwindow.h \
     directedgraph.h \
-    dotgenerator.h \
     dfdelement.h \
-    exception.h
+    exception.h \
+    displayabledfdelement.h
 
 FORMS    += mainwindow.ui

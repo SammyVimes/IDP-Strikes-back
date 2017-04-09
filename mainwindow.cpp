@@ -84,7 +84,9 @@ void MainWindow::drawDFD(DirectedGraph<DFDElement> *graph)
 
     int colOffset = elemSize + (padding * 2);
 
-    std::for_each(graph->begin(), graph->end(), [offsetLeft, padding, elemSize, colOffset, &row, &col, graph, scene](DNode* n) {
+    std::map <int, DisplayableDFDElement> elMap;
+
+    std::for_each(graph->begin(), graph->end(), [&elMap, offsetLeft, padding, elemSize, colOffset, &row, &col, graph, scene](DNode* n) {
         int type = n->getValue().getType();
 
         QBrush greenBrush(Qt::green);
@@ -99,7 +101,11 @@ void MainWindow::drawDFD(DirectedGraph<DFDElement> *graph)
             scene->addRect(offsetLeft + 0, 300, 300, 80);
             break;
         case 2:
-            scene->addEllipse(colOffset * col + padding + offsetLeft, colOffset * row + padding, elemSize, elemSize, outlinePen, greenBrush);
+            QGraphicsItem* item = scene->addEllipse(colOffset * col + padding + offsetLeft, colOffset * row + padding, elemSize, elemSize, outlinePen, greenBrush);
+            DisplayableDFDElement displayable = DisplayableDFDElement(n->getId(), row, col, n->getValue());
+            displayable.setItem(item);
+            elMap[n->getId()] = displayable;
+
             col++;
             if (col > 2) {
                 row++;
@@ -108,5 +114,49 @@ void MainWindow::drawDFD(DirectedGraph<DFDElement> *graph)
             break;
         }
     });
-    graph->begin();
+
+    std::for_each(graph->begin(), graph->end(), [&elMap, offsetLeft, padding, elemSize, colOffset, graph, scene](DNode* n) {
+        int id = n->getId();
+        std::vector<DNode*> outgoingNodes = n->getOutgoingNodes();
+        DisplayableDFDElement selfNode = elMap[id];
+
+        QGraphicsItem* node1 = selfNode.getItem();
+
+        if (!node1) {
+            return;
+        }
+
+        std::for_each(outgoingNodes.begin(), outgoingNodes.end(), [scene, node1, &elMap](DNode* outN) {
+            DisplayableDFDElement el = elMap[outN->getId()];
+            QGraphicsItem* node2 = el.getItem();
+
+            if (!node2) {
+                return;
+            }
+
+            QPen myPen;
+            myPen.setWidth(10);
+            myPen.setColor(QColor(100, 100, 100));
+            qreal arrowSize = 20;
+            QPointF pos1 =  node1->pos();
+            QPointF pos2 =  node2->pos();
+            QLineF line(pos1, pos2);
+
+            QGraphicsLineItem* gLine = scene->addLine(node1->x(), node1->y(), node2->x(), node2->y(), myPen);
+
+            double Pi = 3.1415926;
+
+            double angle = ::acos(line.dx() / line.length());
+            if (line.dy() >= 0) {
+                angle = (Pi * 2) - angle;
+            }
+            QPointF arrowP1 = line.p1() + QPointF(sin(angle + Pi / 3) * arrowSize,
+                                                  cos(angle + Pi / 3) * arrowSize);
+            QPointF arrowP2 = line.p1() + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
+                                                  cos(angle + Pi - Pi / 3) * arrowSize);
+            QPolygonF arrowHead;
+            arrowHead << line.p1() << arrowP1 << arrowP2;
+            scene->addPolygon(arrowHead);
+        });
+    });
 }

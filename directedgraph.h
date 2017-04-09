@@ -83,13 +83,18 @@ public:
 
     public:
 
-        Node(DirectedGraph* graph, const V& value) {
+        Node(DirectedGraph* graph, const V& value, int id) {
             this->value = value;
             this->graph = graph;
+            this->nodeId = id;
         }
 
         V getValue() {
             return this->value;
+        }
+
+        inline int getId() {
+            return this->nodeId;
         }
 
         DirectedGraph* getGraph() {
@@ -105,6 +110,8 @@ public:
         DirectedGraph* graph;
 
         V value;
+
+        int nodeId;
 
         std::vector<Node*> outgoingNodes;
 
@@ -123,7 +130,7 @@ public:
             throw BadGraphException("Node 'from' doesn't belong to this graph");
         }
 
-        Node* n = new Node(this, value);
+        Node* n = new Node(this, value, ++lastId);
         from->addOutgoingNode(n);
 
         this->nodes.push_back(n);
@@ -142,7 +149,7 @@ public:
     }
 
     Node* addNode(const V& value) {
-        Node* n = new Node(this, value);
+        Node* n = new Node(this, value, ++lastId);
         this->nodes.push_back(n);
         return n;
     }
@@ -154,6 +161,8 @@ public:
 private:
 
     std::vector<Node*> nodes;
+
+    int lastId = 0;
 
 };
 
