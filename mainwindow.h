@@ -2,7 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QGraphicsView>
 #include "directedgraph.h"
+#include "dfdelement.h"
 
 namespace Ui {
 class MainWindow;
@@ -15,6 +17,8 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+    void drawDFD(DirectedGraph<DFDElement>* graph);
 
 private:
     Ui::MainWindow *ui;
