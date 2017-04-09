@@ -101,7 +101,10 @@ void MainWindow::drawDFD(DirectedGraph<DFDElement> *graph)
             scene->addRect(offsetLeft + 0, 300, 300, 80);
             break;
         case 2:
-            QGraphicsItem* item = scene->addEllipse(colOffset * col + padding + offsetLeft, colOffset * row + padding, elemSize, elemSize, outlinePen, greenBrush);
+            qreal x = colOffset * col + padding + offsetLeft;
+            qreal y = colOffset * row + padding;
+            QGraphicsItem* item = scene->addEllipse(0, 0, elemSize, elemSize, outlinePen, greenBrush);
+            item->setPos(x, y);
             DisplayableDFDElement displayable = DisplayableDFDElement(n->getId(), row, col, n->getValue());
             displayable.setItem(item);
             elMap[n->getId()] = displayable;
@@ -115,7 +118,7 @@ void MainWindow::drawDFD(DirectedGraph<DFDElement> *graph)
         }
     });
 
-    std::for_each(graph->begin(), graph->end(), [&elMap, offsetLeft, padding, elemSize, colOffset, graph, scene](DNode* n) {
+    std::for_each(graph->begin(), graph->end(), [elemSize, &elMap, offsetLeft, padding, elemSize, colOffset, graph, scene](DNode* n) {
         int id = n->getId();
         std::vector<DNode*> outgoingNodes = n->getOutgoingNodes();
         DisplayableDFDElement selfNode = elMap[id];
@@ -126,7 +129,7 @@ void MainWindow::drawDFD(DirectedGraph<DFDElement> *graph)
             return;
         }
 
-        std::for_each(outgoingNodes.begin(), outgoingNodes.end(), [scene, node1, &elMap](DNode* outN) {
+        std::for_each(outgoingNodes.begin(), outgoingNodes.end(), [elemSize, scene, node1, &elMap](DNode* outN) {
             DisplayableDFDElement el = elMap[outN->getId()];
             QGraphicsItem* node2 = el.getItem();
 
@@ -135,14 +138,15 @@ void MainWindow::drawDFD(DirectedGraph<DFDElement> *graph)
             }
 
             QPen myPen;
-            myPen.setWidth(10);
             myPen.setColor(QColor(100, 100, 100));
             qreal arrowSize = 20;
-            QPointF pos1 =  node1->pos();
-            QPointF pos2 =  node2->pos();
+            QPointF pos1 =  QPointF(node1->x() + (elemSize / 2), node1->y() + (elemSize / 2));
+            QPointF pos2 =  QPointF(node2->x() + (elemSize / 2), node2->y() + (elemSize / 2));
             QLineF line(pos1, pos2);
 
-            QGraphicsLineItem* gLine = scene->addLine(node1->x(), node1->y(), node2->x(), node2->y(), myPen);
+            QGraphicsLineItem* gLine = scene->addLine(pos1.x(), pos1.y(), pos2.x(), pos2.y(), myPen);
+
+            qreal z = node1->x();
 
             double Pi = 3.1415926;
 
