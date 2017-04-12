@@ -7,6 +7,7 @@
 #include "displayabledfdelement.h"
 #include "directedgraph.h"
 #include "dfdelement.h"
+#include <QDate>
 
 namespace Ui {
 class MainWindow;

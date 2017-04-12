@@ -86,7 +86,11 @@ void MainWindow::drawDFD(DirectedGraph<DFDElement> *graph)
 
     std::map <int, DisplayableDFDElement> elMap;
 
-    std::for_each(graph->begin(), graph->end(), [&elMap, offsetLeft, padding, elemSize, colOffset, &row, &col, graph, scene](DNode* n) {
+
+    QDate curDate = QDate::currentDate();
+    int curDay = 1;
+
+    std::for_each(graph->begin(), graph->end(), [&curDate, &curDay, &elMap, offsetLeft, padding, elemSize, colOffset, &row, &col, graph, scene](DNode* n) {
         int type = n->getValue().getType();
 
         QBrush greenBrush(Qt::green);
@@ -121,8 +125,17 @@ void MainWindow::drawDFD(DirectedGraph<DFDElement> *graph)
 
             col++;
             if (col > 2) {
+                qreal x = colOffset * col + padding + offsetLeft;
+                qreal y = colOffset * row + padding;
+                scene->addRect(x, y, elemSize * 2, elemSize);
+                QGraphicsTextItem* text = scene->addText(QString("День ") + QString::number(curDay) + QString("\n"));
+                text->setTextWidth(elemSize * 2);
+                text->setPos(x, y);
+
                 row++;
                 col = 0;
+                curDate = curDate.addDays(1);
+                curDay++;
             }
             break;
         }
