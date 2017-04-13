@@ -228,12 +228,24 @@ void MainWindow::drawDFD(bool rebuildMap)
             QPointF pos1 =  QPointF(node1->x() + (elemSize / 2), node1->y() + (elemSize / 2));
             QPointF pos2 =  QPointF(node2->x() + (elemSize / 2), node2->y() + (elemSize / 2));
 
-            QGraphicsLineItem* gLine = scene->addLine(pos1.x(), pos1.y(), pos2.x(), pos2.y(), myPen);
-
-            double Pi = 3.1415926;
-
             QBrush blackBrush(Qt::black);
             QLineF line(pos2, pos1);
+
+            double Pi = 3.1415926;
+            qreal degAngle = line.angle();
+
+            qreal lAngle = degAngle * (Pi / 180);
+            qreal cosX = cos(lAngle);
+            qreal sinX = sin(lAngle);
+
+
+            qreal newY = (pos2.y()) - sin(lAngle) * (elemSize / 2);
+            qreal newX = (pos2.x()) + cos(lAngle) * (elemSize / 2);
+            line = QLineF(QPointF(newX, newY), pos1);
+
+            QGraphicsLineItem* gLine = scene->addLine(pos1.x(), pos1.y(), newX, newY, myPen);
+
+
             double angle = ::acos(line.dx() / line.length());
             if (line.dy() >= 0) {
                 angle = (Pi * 2) - angle;
