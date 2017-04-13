@@ -43,6 +43,14 @@ public:
         return this->element;
     }
 
+    inline bool isSelected() {
+        return selected;
+    }
+
+    inline void setSelected(bool selected) {
+        this->selected = selected;
+    }
+
 private:
 
     int id;
@@ -50,6 +58,7 @@ private:
     int col;
     DFDElement element;
     QGraphicsItem* item = 0;
+    bool selected = false;
 };
 
 #endif // DISPLAYABLEDFDELEMENT_H

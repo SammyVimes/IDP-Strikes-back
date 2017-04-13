@@ -61,7 +61,8 @@ MainWindow::MainWindow(QWidget *parent) :
     dfd->linkNodes(n22, n32);
     dfd->linkNodes(doctor, n33);
 
-    drawDFD(dfd);
+    this->graph = dfd;
+    drawDFD(true);
 }
 
 MainWindow::~MainWindow()
@@ -69,10 +70,43 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::drawDFD(DirectedGraph<DFDElement> *graph)
+static DisplayableDFDElement* lastSelected;
+
+class IntakeClickListener : public OnClickListener {
+public:
+
+    DisplayableDFDElement* item;
+    MainWindow* window;
+
+    IntakeClickListener(MainWindow* mw, DisplayableDFDElement* item) {
+        this->item = item;
+        this->window = mw;
+    }
+
+    virtual void onClick(QGraphicsEllipseItem *clickedItem) {
+        item->setSelected(true);
+        if (lastSelected) {
+            lastSelected->setSelected(false);
+        }
+        if (lastSelected == item) {
+            lastSelected = nullptr;
+        } else {
+            lastSelected = item;
+        }
+        window->drawDFD(false);
+    }
+};
+
+void MainWindow::drawDFD(bool rebuildMap)
 {
     QGraphicsView* gView = this->ui->graphicsView;
     QGraphicsScene* scene = gView->scene();
+    scene->clear();
+
+    if (rebuildMap) {
+        elMap.clear();
+    }
+
     using DNode = DirectedGraph<DFDElement>::Node;
 
     int row = 0;
@@ -84,13 +118,11 @@ void MainWindow::drawDFD(DirectedGraph<DFDElement> *graph)
 
     int colOffset = elemSize + (padding * 2);
 
-    std::map <int, DisplayableDFDElement> elMap;
-
-
     QDate curDate = QDate::currentDate();
     int curDay = 1;
 
-    std::for_each(graph->begin(), graph->end(), [&curDate, &curDay, &elMap, offsetLeft, padding, elemSize, colOffset, &row, &col, graph, scene](DNode* n) {
+    DirectedGraph<DFDElement>* graph = this->graph;
+    std::for_each(graph->begin(), graph->end(), [this, rebuildMap, &curDate, &curDay, offsetLeft, padding, elemSize, colOffset, &row, &col, graph, scene](DNode* n) {
         int type = n->getValue().getType();
 
         QBrush greenBrush(Qt::green);
@@ -101,34 +133,58 @@ void MainWindow::drawDFD(DirectedGraph<DFDElement> *graph)
         case 0: {
             QGraphicsItem* item = scene->addRect(0, 0, 80, 300);
             item->setPos(0, 0);
-            DisplayableDFDElement displayable = DisplayableDFDElement(n->getId(), -1, -1, n->getValue());
-            displayable.setItem(item);
-            elMap[n->getId()] = displayable;
+            DisplayableDFDElement* displayable;
+            if (rebuildMap) {
+                displayable = new DisplayableDFDElement(n->getId(), -1, -1, n->getValue());
+                this->elMap[n->getId()] = displayable;
+            } else {
+                displayable = this->elMap[n->getId()];
+            }
+            displayable->setItem(item);
             break;
         }
         case 1: {
             QGraphicsItem* item = scene->addRect(0, 0, 300, 80);
             item->setPos(offsetLeft + 0, 300);
-            DisplayableDFDElement displayable = DisplayableDFDElement(n->getId(), -1, -1, n->getValue());
-            displayable.setItem(item);
-            elMap[n->getId()] = displayable;
+
+            DisplayableDFDElement* displayable;
+            if (rebuildMap) {
+                displayable = new DisplayableDFDElement(n->getId(), -1, -1, n->getValue());
+                this->elMap[n->getId()] = displayable;
+            } else {
+                displayable = this->elMap[n->getId()];
+            }
+            displayable->setItem(item);
             break;
         }
         case 2: {
             qreal x = colOffset * col + padding + offsetLeft;
             qreal y = colOffset * row + padding;
-            QGraphicsItem* item = scene->addEllipse(0, 0, elemSize, elemSize, outlinePen, greenBrush);
+            ClickableEllipseItem* item = new ClickableEllipseItem();
+            item->setRect(0, 0, elemSize, elemSize);
             item->setPos(x, y);
-            DisplayableDFDElement displayable = DisplayableDFDElement(n->getId(), row, col, n->getValue());
-            displayable.setItem(item);
-            elMap[n->getId()] = displayable;
+            item->setPen(outlinePen);
+            item->setBrush(greenBrush);
+            scene->addItem(item);
+            DisplayableDFDElement* displayable;
+            if (rebuildMap) {
+                displayable = new DisplayableDFDElement(n->getId(), row, col, n->getValue());
+                this->elMap[n->getId()] = displayable;
+            } else {
+                displayable = this->elMap[n->getId()];
+            }
+            displayable->setItem(item);
+            item->listener = new IntakeClickListener(this, displayable);
 
             col++;
             if (col > 2) {
                 qreal x = colOffset * col + padding + offsetLeft;
                 qreal y = colOffset * row + padding;
                 scene->addRect(x, y, elemSize * 2, elemSize);
-                QGraphicsTextItem* text = scene->addText(QString("День ") + QString::number(curDay) + QString("\n"));
+                QGraphicsTextItem* text = scene->addText(QString("День ")
+                                                         + QString::number(curDay)
+                                                         + QString("\n")
+                                                         + curDate.toString("dd MMMM"));
                 text->setTextWidth(elemSize * 2);
                 text->setPos(x, y);
 
@@ -142,22 +198,26 @@ void MainWindow::drawDFD(DirectedGraph<DFDElement> *graph)
         }
     });
 
-    std::for_each(graph->begin(), graph->end(), [elemSize, &elMap, offsetLeft, padding, elemSize, colOffset, graph, scene](DNode* n) {
+    std::for_each(graph->begin(), graph->end(), [this, offsetLeft, padding, elemSize, colOffset, graph, scene](DNode* n) {
         int id = n->getId();
         std::vector<DNode*> outgoingNodes = n->getOutgoingNodes();
-        DisplayableDFDElement selfNode = elMap[id];
+        DisplayableDFDElement* selfNode = elMap[id];
 
-        QGraphicsItem* node1 = selfNode.getItem();
+        QGraphicsItem* node1 = selfNode->getItem();
 
         if (!node1) {
             return;
         }
 
-        std::for_each(outgoingNodes.begin(), outgoingNodes.end(), [elemSize, scene, node1, &elMap](DNode* outN) {
-            DisplayableDFDElement el = elMap[outN->getId()];
-            QGraphicsItem* node2 = el.getItem();
+        std::for_each(outgoingNodes.begin(), outgoingNodes.end(), [this, &selfNode, elemSize, scene, node1](DNode* outN) {
+            DisplayableDFDElement* el = this->elMap[outN->getId()];
+            QGraphicsItem* node2 = el->getItem();
 
             if (!node2) {
+                return;
+            }
+
+            if (!selfNode->isSelected() && !el->isSelected()) {
                 return;
             }
 
