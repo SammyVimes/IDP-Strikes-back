@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "exception.h"
+#include <iomanip>
 
 class NullPointerException;
 
@@ -168,6 +169,12 @@ public:
         return n;
     }
 
+    template <typename V2>
+    friend std::ostream& operator<< (std::ostream& os, const DirectedGraph<V2>& dt);
+
+    template <typename V2>
+    friend std::istream& operator>> (std::istream& is, DirectedGraph<V2>& dt);
+
     void linkNodes(Node* nodeFrom, Node* nodeTo) {
         if (nodeFrom->getGraph() != this) {
             throw BadGraphException("Node 'from' doesn't belong to this graph");
@@ -300,6 +307,70 @@ void DirectedGraph<V>::Allocator::returnAll()
                 [](DirectedGraph<V>::Node* i) {delete i;});
 
   nodesPool.clear();
+}
+
+
+template<typename V>
+class NodeManipulator
+  {
+
+  typedef typename DirectedGraph<V>::Node* NodePtr;
+
+  public:
+    NodeManipulator(NodePtr val){
+        nodePointer = val;
+    }
+
+    template <typename V2>
+    friend std::ostream& operator<< (std::ostream& os, const NodeManipulator<V2>& dt);
+
+  private:
+    NodePtr nodePointer;
+  };
+
+template<typename V, typename E>
+std::ostream& operator<< (std::ostream& os, const NodeManipulator<V>& dt)
+{
+  if(!dt.nodePointer) return os;
+
+  dt.nodePointer->
+  os << dt.nodePointer->getSource()->getData() << "\n"
+     << dt.nodePointer->getDestenation()->getData() << "\n"
+     << dt.nodePointer->getValue() << "\n";
+  return os;
+}
+
+
+template <typename V2>
+std::ostream& operator<< (std::ostream& os, const DirectedGraph<V2>& dt) {
+    typedef typename DirectedGraph<V2>::Node NODE;
+    os << dt.nodes.size() << "\n";
+    size_t edgesCounter = 0;
+    std::for_each (dt.nodes.begin(), dt.nodes.end(), [&os, &edgesCounter](NODE* i)
+    {
+             DirectedGraph<V2>::Node* n = i;
+             os << i->getValue() << "\n";
+             edgesCounter += i->getOutgoingNodes().size();
+    });
+
+    os << edgesCounter << "\n";
+
+    std::for_each (dt.nodes.begin(), dt.nodes.end(), [&os](NODE* i)
+    {
+      auto outgoingNodes = i->getOutgoingNodes();
+
+      std::for_each(outgoingNodes.begin(), outgoingNodes.end(), [&os](NODE* j)
+      {
+        os << NodeManipulator<V2>(j);
+      });
+    });
+
+    return os;
+}
+
+template <typename V2>
+friend std::istream& operator>> (std::istream& is, DirectedGraph<V2>& dt) {
+
 }
 
 #endif // DIRECTEDGRAPH_H
