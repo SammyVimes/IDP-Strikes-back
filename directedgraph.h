@@ -8,6 +8,8 @@ class NullPointerException;
 
 #define THROW_DG_NULL_POINTER_EXCEPTION(s) throw NullPointerException(s, __LINE__, __FUNCTION__, __TIMESTAMP__)
 
+#define THROW_DG_ALLOCATOR_EXCEPTION(s) throw AllocatorException(s, __LINE__, __FUNCTION__, __TIMESTAMP__)
+
 class BadGraphException {
 
 private:
@@ -34,6 +36,16 @@ class NullPointerException: public Exception
    {
    }
  };
+
+class AllocatorException: public Exception
+ {
+ public:
+   AllocatorException(std::string text, int line, std::string function, std::string timestamp):
+     Exception(text, line, function, timestamp)
+   {
+   }
+ };
+
 
 template <class V>
 class DirectedGraph
@@ -124,6 +136,25 @@ public:
         }
 
     };
+
+    private:
+        class Allocator
+        {
+        public:
+          Allocator(){}
+          virtual ~Allocator();
+
+          Node* getNode(DirectedGraph* graph, const V& value, int id);
+
+          void returnNode(Node* vertex);
+
+          void returnAll();
+
+        private:
+          std::list<Node*> nodesPool;
+        };
+
+    Allocator alloc;
 
     Node* addNode(Node* from, const V& value) throw(BadGraphException) {
         if (from->getGraph() != this) {
@@ -232,5 +263,43 @@ template<class V> inline
     }
     return *_vertexIterator;
   }
+
+template<typename V> inline
+DirectedGraph<V>::Allocator::~Allocator()
+{
+  returnAll();
+}
+
+template<typename V> inline
+typename DirectedGraph<V>::Node *DirectedGraph<V>::Allocator::getNode(DirectedGraph* graph, const V& value, int id)
+{
+  DirectedGraph<V>::Node* newNode = new DirectedGraph<V>::Node(graph, value, id);
+  nodesPool.push_back(newNode);
+  return newNode;
+}
+
+template<typename V> inline
+void DirectedGraph<V>::Allocator::returnNode(DirectedGraph<V>::Node *node)
+{
+  auto pos = std::find(nodesPool.begin(), nodesPool.end(), node);
+
+  if(pos == nodesPool.end())
+  {
+    THROW_DG_ALLOCATOR_EXCEPTION("can't find returned value in nodes pool!");
+    return;
+  }
+
+  nodesPool.erase(pos);
+  delete node;
+}
+
+template<typename V> inline
+void DirectedGraph<V>::Allocator::returnAll()
+{
+  std::for_each(nodesPool.begin(), nodesPool.end(),
+                [](DirectedGraph<V>::Node* i) {delete i;});
+
+  nodesPool.clear();
+}
 
 #endif // DIRECTEDGRAPH_H
