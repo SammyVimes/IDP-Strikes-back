@@ -19,13 +19,16 @@ SOURCES += main.cpp\
     dfdelement.cpp \
     exception.cpp \
     displayabledfdelement.cpp \
-    clickableellipseitem.cpp
+    clickableellipseitem.cpp \
+    planwindow.cpp
 
 HEADERS  += mainwindow.h \
     directedgraph.h \
     dfdelement.h \
     exception.h \
     displayabledfdelement.h \
-    clickableellipseitem.h
+    clickableellipseitem.h \
+    planwindow.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    planwindow.ui
