@@ -20,7 +20,11 @@ SOURCES += main.cpp\
     exception.cpp \
     displayabledfdelement.cpp \
     clickableellipseitem.cpp \
-    planwindow.cpp
+    planwindow.cpp \
+    addpilldialog.cpp \
+    addfooddialog.cpp \
+    food.cpp \
+    pill.cpp
 
 HEADERS  += mainwindow.h \
     directedgraph.h \
@@ -28,7 +32,13 @@ HEADERS  += mainwindow.h \
     exception.h \
     displayabledfdelement.h \
     clickableellipseitem.h \
-    planwindow.h
+    planwindow.h \
+    addpilldialog.h \
+    addfooddialog.h \
+    food.h \
+    pill.h
 
 FORMS    += mainwindow.ui \
-    planwindow.ui
+    planwindow.ui \
+    addpilldialog.ui \
+    addfooddialog.ui
