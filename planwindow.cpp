@@ -72,9 +72,9 @@ class IntakeClickListener : public OnClickListener {
 public:
 
     DisplayableDFDElement* item;
-    MainWindow* window;
+    PlanWindow* window;
 
-    IntakeClickListener(MainWindow* mw, DisplayableDFDElement* item) {
+    IntakeClickListener(PlanWindow* mw, DisplayableDFDElement* item) {
         this->item = item;
         this->window = mw;
     }
