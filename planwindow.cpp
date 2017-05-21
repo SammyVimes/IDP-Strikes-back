@@ -37,19 +37,32 @@ PlanWindow::PlanWindow(QWidget *parent) :
     delete graph;
     delete graph2;
 
-    using DNode = DirectedGraph<DFDElement>::Node;
-    DirectedGraph<DFDElement>* dfd = new DirectedGraph<DFDElement>;
-    DNode* cooking = dfd->addNode(DFDElement(0));
-    DNode* doctor = dfd->addNode(DFDElement(1));
-    DNode* n11 = dfd->addNode(cooking, DFDElement(2));
-    DNode* n12 = dfd->addNode(cooking, DFDElement(2));
-    DNode* n13 = dfd->addNode(n11, DFDElement(2));
-    DNode* n21 = dfd->addNode(n13, DFDElement(2));
-    DNode* n22 = dfd->addNode(n12, DFDElement(2));
-    DNode* n23 = dfd->addNode(doctor, DFDElement(2));
-    DNode* n31 = dfd->addNode(n23, DFDElement(2));
-    DNode* n32 = dfd->addNode(n31, DFDElement(2));
-    DNode* n33 = dfd->addNode(n32, DFDElement(2));
+    testGraph();
+}
+
+void PlanWindow::testGraph() {
+    Pill nimesil(QString("Нимесил"), 5, true, 1, QString::number(5));
+    Pill asspirine(QString("Assпирин"), 5, true, 1, QString::number(5));
+    Food pizz(QString("Пепперони"), QString("Pickle x1, Box x1"), 15, 1);
+
+
+    using DNode = DirectedGraph<DFDElement*>::Node;
+    DirectedGraph<DFDElement*>* dfd = new DirectedGraph<DFDElement*>;
+    DNode* cooking = dfd->addNode(new DFDElement(0));
+    DNode* doctor = dfd->addNode(new DFDElement(1));
+    CookingProcess *p = new CookingProcess(2);
+    std::vector<Food> vec;
+    vec.push_back(pizz);
+    p->setMenu(vec);
+    DNode* n11 = dfd->addNode(cooking, p);
+    DNode* n12 = dfd->addNode(cooking, new DFDElement(2));
+    DNode* n13 = dfd->addNode(n11, new DFDElement(2));
+    DNode* n21 = dfd->addNode(n13, new DFDElement(2));
+    DNode* n22 = dfd->addNode(n12, new DFDElement(2));
+    DNode* n23 = dfd->addNode(doctor, new DFDElement(2));
+    DNode* n31 = dfd->addNode(n23, new DFDElement(2));
+    DNode* n32 = dfd->addNode(n31, new DFDElement(2));
+    DNode* n33 = dfd->addNode(n32, new DFDElement(2));
     dfd->linkNodes(doctor, n11);
     dfd->linkNodes(doctor, n13);
     dfd->linkNodes(doctor, n21);
@@ -61,7 +74,6 @@ PlanWindow::PlanWindow(QWidget *parent) :
     drawDFD(true);
 
     std::cout << *this->graph;
-
 }
 
 PlanWindow::~PlanWindow()
@@ -107,7 +119,7 @@ void PlanWindow::drawDFD(bool rebuildMap)
         elMap.clear();
     }
 
-    using DNode = DirectedGraph<DFDElement>::Node;
+    using DNode = DirectedGraph<DFDElement*>::Node;
 
     int row = 0;
     int col = 0;
@@ -121,9 +133,9 @@ void PlanWindow::drawDFD(bool rebuildMap)
     QDate curDate = QDate::currentDate();
     int curDay = 1;
 
-    DirectedGraph<DFDElement>* graph = this->graph;
+    DirectedGraph<DFDElement*>* graph = this->graph;
     std::for_each(graph->begin(), graph->end(), [this, rebuildMap, &curDate, &curDay, offsetLeft, padding, elemSize, colOffset, &row, &col, graph, scene](DNode* n) {
-        int type = n->getValue().getType();
+        int type = n->getValue()->getType();
 
         QBrush greenBrush(Qt::green);
         QPen outlinePen(Qt::black);
@@ -248,3 +260,4 @@ void PlanWindow::drawDFD(bool rebuildMap)
         });
     });
 }
+

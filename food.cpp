@@ -1,13 +1,18 @@
 #include "food.h"
 
 Food::Food(QString name, QString comp, int expirationDate, int amount) :
-    m_name(name), m_comp(comp), m_expirationDate(expirationDate), m_amount(amount)
+    m_name(name),m_expirationDate(expirationDate), m_amount(amount)
 {
-
+    QStringList lst = comp.split(",");
+    for(QStringList::const_iterator it = lst.begin();
+          it != lst.end(); ++it) {
+        QString z = *it;
+        m_comp.push_back(z);
+    }
 }
 
 Food::Food(const Food &f) :
-    m_name(f.name()), m_comp(f.comp()), m_expirationDate(f.expirationDate()), m_amount(f.amount())
+    m_name(f.name()), m_comp(f.compVec()), m_expirationDate(f.expirationDate()), m_amount(f.amount())
 {
 
 }
@@ -22,12 +27,31 @@ void Food::setName(const QString &name)
     m_name = name;
 }
 
-QString Food::comp() const
+QString concat_strings(const std::vector<QString> &elements,
+                       const QString separator)
 {
-    return m_comp;
+if (!elements.empty())
+{
+    QString str;
+    auto it = elements.cbegin();
+    while (true)
+    {
+        str.append(*it++);
+        if (it != elements.cend())
+            str.append(separator);
+        else
+            return str;
+    }
+}
+return QString("");
 }
 
-void Food::setComp(const QString &comp)
+QString Food::comp() const
+{
+    return concat_strings(m_comp, QString(", "));
+}
+
+void Food::setComp(const vector<QString> &comp)
 {
     m_comp = comp;
 }

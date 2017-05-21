@@ -8,7 +8,7 @@
 
 using namespace std;
 
-class MedsProcess : DFDElement
+class MedsProcess : public DFDElement
 {
 public:
 

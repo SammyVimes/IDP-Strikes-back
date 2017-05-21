@@ -348,7 +348,7 @@ std::ostream& operator<< (std::ostream& os, const NodeManipulator<V2>& dt)
       os << "<id>" << std::to_string(i->getId()) << "</id>"  << endl;
   });
 
-  os << "</connections>" << endl;
+  os << "</connections></node>" << endl;
 
   return os;
 }
@@ -377,7 +377,7 @@ std::ostream& operator<< (std::ostream& os, const DirectedGraph<V2>& dt) {
     {
         os << NodeManipulator<V2>(i);
     });
-    os << "/<outgoing>" << endl;
+    os << "</outgoing>" << endl;
 
     os << "</plan>" << endl;
 

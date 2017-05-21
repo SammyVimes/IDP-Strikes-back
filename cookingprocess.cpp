@@ -11,16 +11,16 @@ void CookingProcess::setMenu(const vector<Food> &value)
 }
 
 
-void CookingProcess::printToStream(ostream &os)
+void CookingProcess::printToStream(ostream &os) const
 {
     os << "<cooking>" << endl;
 
-    os << "<menu>";
-    std::for_each (menu.begin(), menu.end(), [&os](Food i)
-    {
-        i.printStream(os);
-    });
-    os << "</menu>";
+     os << "<menu>";
+     std::for_each (menu.begin(), menu.end(), [&os](Food i)
+     {
+         i.printStream(os);
+     });
+     os << "</menu>";
 
-    os << "</cooking>" << endl;
+     os << "</cooking>" << endl;
 }

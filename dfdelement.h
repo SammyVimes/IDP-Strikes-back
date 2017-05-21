@@ -20,7 +20,7 @@ public:
 
     }
 
-    friend std::ostream& operator<< (std::ostream& os, const DFDElement& dt);
+    friend std::ostream& operator<< (std::ostream& os, const DFDElement* dt);
 
 private:
     int type;

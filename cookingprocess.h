@@ -8,7 +8,7 @@
 
 using namespace std;
 
-class CookingProcess : DFDElement
+class CookingProcess : public DFDElement
 {
 public:
 
@@ -30,7 +30,7 @@ private:
 
     // DFDElement interface
 public:
-    void printToStream(ostream &os);
+    virtual void printToStream(ostream &os) const override;
 };
 
 #endif // COOKINGPROCESS_H
