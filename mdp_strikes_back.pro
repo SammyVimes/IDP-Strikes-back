@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui xml
 
 CONFIG += c++11
 
@@ -19,13 +19,26 @@ SOURCES += main.cpp\
     dfdelement.cpp \
     exception.cpp \
     displayabledfdelement.cpp \
-    clickableellipseitem.cpp
+    clickableellipseitem.cpp \
+    planwindow.cpp \
+    addpilldialog.cpp \
+    addfooddialog.cpp \
+    food.cpp \
+    pill.cpp
 
 HEADERS  += mainwindow.h \
     directedgraph.h \
     dfdelement.h \
     exception.h \
     displayabledfdelement.h \
-    clickableellipseitem.h
+    clickableellipseitem.h \
+    planwindow.h \
+    addpilldialog.h \
+    addfooddialog.h \
+    food.h \
+    pill.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    planwindow.ui \
+    addpilldialog.ui \
+    addfooddialog.ui

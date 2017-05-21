@@ -2,13 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QGraphicsView>
-#include <map>
-#include "displayabledfdelement.h"
-#include "directedgraph.h"
-#include "dfdelement.h"
-#include <QDate>
-#include "clickableellipseitem.h"
+#include "food.h"
+#include "planwindow.h"
+#include "addpilldialog.h"
+#include "addfooddialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -21,12 +18,20 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    void drawDFD(bool rebuildMap);
+
+private slots:
+    void on_createPlanPushButton_clicked();
+    void on_addPillPushButton_clicked();
+    void on_addFoodPushButton_clicked();
+    void addFood(Food f);
+    void addPill(Pill p);
+    void refreshFoodDesc();
+    void refreshPillDesc();
 
 private:
     Ui::MainWindow *ui;
-    DirectedGraph<DFDElement> *graph;
-    std::map <int, DisplayableDFDElement*> elMap;
+    AddPillDialog *apd = NULL;
+    AddFoodDialog *afd = NULL;
 };
 
 #endif // MAINWINDOW_H

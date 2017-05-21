@@ -157,6 +157,7 @@ public:
 
     Allocator alloc;
 
+public:
     Node* addNode(Node* from, const V& value) throw(BadGraphException) {
         if (from->getGraph() != this) {
             throw BadGraphException("Node 'from' doesn't belong to this graph");
