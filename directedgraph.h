@@ -4,6 +4,9 @@
 #include <vector>
 #include "exception.h"
 #include <iomanip>
+#include <QtXml>
+
+using namespace std;
 
 class NullPointerException;
 
@@ -329,48 +332,61 @@ class NodeManipulator
     NodePtr nodePointer;
   };
 
-template<typename V, typename E>
-std::ostream& operator<< (std::ostream& os, const NodeManipulator<V>& dt)
+template<typename V2>
+std::ostream& operator<< (std::ostream& os, const NodeManipulator<V2>& dt)
 {
+  typedef typename DirectedGraph<V2>::Node NODE;
   if(!dt.nodePointer) return os;
 
-  dt.nodePointer->
-  os << dt.nodePointer->getSource()->getData() << "\n"
-     << dt.nodePointer->getDestenation()->getData() << "\n"
-     << dt.nodePointer->getValue() << "\n";
+  auto outgoingNodes = dt.nodePointer->getOutgoingNodes();
+
+  auto node = dt.nodePointer;
+  os << QString("<node><id>").append(QString::number(node->getId())).append("</id><connections>").toStdString();
+
+  std::for_each (outgoingNodes.begin(), outgoingNodes.end(), [&node, &os](NODE* i)
+  {
+      os << "<id>" << std::to_string(i->getId()) << "</id>"  << endl;
+  });
+
+  os << "</connections>" << endl;
+
   return os;
 }
-
 
 template <typename V2>
 std::ostream& operator<< (std::ostream& os, const DirectedGraph<V2>& dt) {
     typedef typename DirectedGraph<V2>::Node NODE;
-    os << dt.nodes.size() << "\n";
     size_t edgesCounter = 0;
+
+    os << "<plan>" << endl;
+
+    os << "<nodes>" << endl;
+
     std::for_each (dt.nodes.begin(), dt.nodes.end(), [&os, &edgesCounter](NODE* i)
     {
-             DirectedGraph<V2>::Node* n = i;
-             os << i->getValue() << "\n";
-             edgesCounter += i->getOutgoingNodes().size();
+
+        string x =  QString("<node><id>").append(QString::number(i->getId())).append("</id><value>").toStdString();
+        os << x << endl ;
+        os << i->getValue();
+        os << "</value></node>";
     });
 
-    os << edgesCounter << "\n";
+    os << "</nodes>" << endl;
 
+    os << "<outgoing>" << endl;
     std::for_each (dt.nodes.begin(), dt.nodes.end(), [&os](NODE* i)
     {
-      auto outgoingNodes = i->getOutgoingNodes();
-
-      std::for_each(outgoingNodes.begin(), outgoingNodes.end(), [&os](NODE* j)
-      {
-        os << NodeManipulator<V2>(j);
-      });
+        os << NodeManipulator<V2>(i);
     });
+    os << "/<outgoing>" << endl;
+
+    os << "</plan>" << endl;
 
     return os;
 }
 
 template <typename V2>
-friend std::istream& operator>> (std::istream& is, DirectedGraph<V2>& dt) {
+std::istream& operator>> (std::istream& is, DirectedGraph<V2>& dt) {
 
 }
 

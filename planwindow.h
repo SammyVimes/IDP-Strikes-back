@@ -9,6 +9,7 @@
 #include "dfdelement.h"
 #include <QDate>
 #include "clickableellipseitem.h"
+#include <iostream>
 
 namespace Ui {
 class PlanWindow;

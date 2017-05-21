@@ -1,6 +1,7 @@
 #ifndef DFDELEMENT_H
 #define DFDELEMENT_H
 
+#include <iostream>
 
 class DFDElement
 {
@@ -14,6 +15,8 @@ public:
     inline int getType() {
         return this->type;
     }
+
+    friend std::ostream& operator<< (std::ostream& os, const DFDElement& dt);
 
 private:
     int type;

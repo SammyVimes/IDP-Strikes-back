@@ -59,6 +59,9 @@ PlanWindow::PlanWindow(QWidget *parent) :
 
     this->graph = dfd;
     drawDFD(true);
+
+    std::cout << *this->graph;
+
 }
 
 PlanWindow::~PlanWindow()
