@@ -44,7 +44,7 @@ private:
 
     // DFDElement interface
 public:
-    void printToStream(ostream &os);
+    virtual void printToStream(ostream &os) const override;
 };
 
 #endif // EATINGPROCESS_H

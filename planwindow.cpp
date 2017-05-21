@@ -54,11 +54,19 @@ void PlanWindow::testGraph() {
     std::vector<Food> vec;
     vec.push_back(pizz);
     p->setMenu(vec);
+
+    EatingProcess* p2 = new EatingProcess(2);
+    p2->setFood(pizz);
+    vector<Pill> before = {asspirine};
+    vector<Pill> after = {nimesil};
+    p2->setMedsAfterEating(after);
+    p2->setMedsBeforeEating(before);
+
     DNode* n11 = dfd->addNode(cooking, p);
     DNode* n12 = dfd->addNode(cooking, new DFDElement(2));
     DNode* n13 = dfd->addNode(n11, new DFDElement(2));
     DNode* n21 = dfd->addNode(n13, new DFDElement(2));
-    DNode* n22 = dfd->addNode(n12, new DFDElement(2));
+    DNode* n22 = dfd->addNode(n12, p2);
     DNode* n23 = dfd->addNode(doctor, new DFDElement(2));
     DNode* n31 = dfd->addNode(n23, new DFDElement(2));
     DNode* n32 = dfd->addNode(n31, new DFDElement(2));
@@ -72,8 +80,18 @@ void PlanWindow::testGraph() {
 
     this->graph = dfd;
     drawDFD(true);
+    stringstream ss;
+    ss << *this->graph;
 
-    std::cout << *this->graph;
+    QString filename="Data.txt";
+    QFile file( filename );
+    if ( file.open(QIODevice::ReadWrite) )
+    {
+        QTextStream stream( &file );
+        stream << QString::fromStdString(ss.str());
+    }
+    QTextStream ts( stdout );
+    ts << QString::fromStdString(ss.str());
 }
 
 PlanWindow::~PlanWindow()

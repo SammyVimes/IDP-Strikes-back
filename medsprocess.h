@@ -32,9 +32,10 @@ private:
     vector<QString> rejectedFood;
     vector<Pill> pills;
 
+
     // DFDElement interface
 public:
-    void printToStream(ostream &os);
+    virtual void printToStream(ostream &os) const override;
 };
 
 #endif // MEDSPROCESS_H

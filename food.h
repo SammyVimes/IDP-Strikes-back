@@ -34,7 +34,7 @@ public:
     int amount() const;
     void setAmount(int amount);
 
-    void printStream(ostream& os) {
+    void printStream(ostream& os) const {
         os << "<food>";
         os << "<name>" << endl;
         os << m_name.toStdString() << endl;

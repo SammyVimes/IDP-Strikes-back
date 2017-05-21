@@ -30,7 +30,9 @@ void EatingProcess::setMedsAfterEating(const vector<Pill> &value)
     medsAfterEating = value;
 }
 
-void EatingProcess::printToStream(ostream &os) {
+
+void EatingProcess::printToStream(ostream &os) const
+{
     os << "<eating>" << endl;
 
     os << "<before>";
@@ -43,7 +45,7 @@ void EatingProcess::printToStream(ostream &os) {
     food.printStream(os);
 
     os << "<after>";
-    std::for_each (medsBeforeEating.begin(), medsBeforeEating.end(), [&os](Pill i)
+    std::for_each (medsAfterEating.begin(), medsAfterEating.end(), [&os](Pill i)
     {
         i.printStream(os);
     });

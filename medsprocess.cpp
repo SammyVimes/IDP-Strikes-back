@@ -22,7 +22,7 @@ void MedsProcess::setPills(const vector<Pill> &value)
 }
 
 
-void MedsProcess::printToStream(ostream &os)
+void MedsProcess::printToStream(ostream &os) const
 {
     os << "<meds>" << endl;
 
