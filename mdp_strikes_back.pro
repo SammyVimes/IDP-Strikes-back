@@ -24,7 +24,10 @@ SOURCES += main.cpp\
     addpilldialog.cpp \
     addfooddialog.cpp \
     food.cpp \
-    pill.cpp
+    pill.cpp \
+    eatingprocess.cpp \
+    cookingprocess.cpp \
+    medsprocess.cpp
 
 HEADERS  += mainwindow.h \
     directedgraph.h \
@@ -36,7 +39,10 @@ HEADERS  += mainwindow.h \
     addpilldialog.h \
     addfooddialog.h \
     food.h \
-    pill.h
+    pill.h \
+    eatingprocess.h \
+    cookingprocess.h \
+    medsprocess.h
 
 FORMS    += mainwindow.ui \
     planwindow.ui \

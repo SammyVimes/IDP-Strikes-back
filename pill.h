@@ -2,12 +2,18 @@
 #define PILL_H
 
 #include <QString>
+#include <iostream>
+
+using namespace std;
 
 class Pill
 {
 public:
     Pill(QString name, int lifeTime, bool beforeFlag, int takeTimeMask, QString amount);
     Pill(const Pill &p);
+    Pill() {
+
+    }
 
     QString name() const;
     void setName(const QString &name);
@@ -23,6 +29,12 @@ public:
 
     int getLifeTime() const;
     void setLifeTime(int lifeTime);
+
+    void printStream(ostream& os) {
+        os << "<pill>" << endl;
+
+        os << "</pill>" << endl;
+    }
 
 private:
     QString m_name;

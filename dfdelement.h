@@ -16,6 +16,10 @@ public:
         return this->type;
     }
 
+    virtual void printToStream(std::ostream& os) const {
+
+    }
+
     friend std::ostream& operator<< (std::ostream& os, const DFDElement& dt);
 
 private:

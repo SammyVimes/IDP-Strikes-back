@@ -2,12 +2,18 @@
 #define FOOD_H
 
 #include <QString>
+#include <iostream>
+
+using namespace std;
 
 class Food
 {
 public:
     Food(QString name, QString comp, int expirationDate, int amount);
     Food(const Food &f);
+    Food() {
+
+    }
 
     QString name() const;
     void setName(const QString &name);
@@ -20,6 +26,11 @@ public:
 
     int amount() const;
     void setAmount(int amount);
+
+    void printStream(ostream& os) {
+        os << "<food>";
+        os << "</food>";
+    }
 
 private:
     QString m_name;

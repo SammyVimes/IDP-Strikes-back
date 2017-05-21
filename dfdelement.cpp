@@ -7,5 +7,5 @@ DFDElement::DFDElement(int type)
 
 
 std::ostream& operator<< (std::ostream& os, const DFDElement& dt) {
-
+    dt.printToStream(os);
 }

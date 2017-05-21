@@ -364,7 +364,6 @@ std::ostream& operator<< (std::ostream& os, const DirectedGraph<V2>& dt) {
 
     std::for_each (dt.nodes.begin(), dt.nodes.end(), [&os, &edgesCounter](NODE* i)
     {
-
         string x =  QString("<node><id>").append(QString::number(i->getId())).append("</id><value>").toStdString();
         os << x << endl ;
         os << i->getValue();
