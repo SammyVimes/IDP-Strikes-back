@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    cbf = new CheckBoxFabric(this);
     addPill(Pill("Бисептол", 10, true, 0b011, "2 таб"));
     addFood(Food("Макароны по-флотски", "макароны, фарш из свинины, лук", 3, 4));
 }
@@ -13,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete cbf;
 }
 
 void MainWindow::on_createPlanPushButton_clicked()
@@ -44,21 +46,17 @@ void MainWindow::on_addFoodPushButton_clicked()
 
 void MainWindow::addFood(Food f)
 {
-    QCheckBox *ch = new QCheckBox(this);
-    ch->setText(f.name());
-    Food *fp = new Food(f);
-    ch->setProperty("val", qVariantFromValue((void *)fp));
-    connect(ch, SIGNAL(clicked(bool)), this, SLOT(refreshFoodDesc()));
+    QCheckBox *ch = cbf->getCheckBox(f);
+    connect(ch, SIGNAL(refreshDescription()), this, SLOT(refreshFoodDesc()));
+    connect(ch, SIGNAL(clearDescription()), ui->foodPlainTextEdit, SLOT(clear()));
     ui->foodVerticalLayout->addWidget(ch);
 }
 
 void MainWindow::addPill(Pill p)
 {
-    QCheckBox *ch = new QCheckBox(this);
-    ch->setText(p.name());
-    Pill *pp = new Pill(p);
-    ch->setProperty("val", qVariantFromValue((void *)pp));
-    connect(ch, SIGNAL(clicked(bool)), this, SLOT(refreshPillDesc()));
+    QCheckBox *ch = cbf->getCheckBox(p);
+    connect(ch, SIGNAL(refreshDescription()), this, SLOT(refreshPillDesc()));
+    connect(ch, SIGNAL(clearDescription()), ui->pillPlainTextEdit, SLOT(clear()));
     ui->pillsVerticalLayout->addWidget(ch);
 }
 
