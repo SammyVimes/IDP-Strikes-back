@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     cbf = new CheckBoxFabric(this);
+
     connect(ui->birthDateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(validate()));
     connect(ui->fioLineEdit, SIGNAL(textChanged(QString)), this, SLOT(validate()));
 
