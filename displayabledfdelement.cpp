@@ -1,6 +1,6 @@
 #include "displayabledfdelement.h"
 
-DisplayableDFDElement::DisplayableDFDElement(int id, int row, int col, DFDElement dfdElement)
+DisplayableDFDElement::DisplayableDFDElement(int id, int row, int col, DFDElement *dfdElement)
 {
     this->col = col;
     this->row = row;

@@ -7,7 +7,7 @@
 class DisplayableDFDElement
 {
 public:
-    DisplayableDFDElement(int id, int row, int col, DFDElement dfdElement);
+    DisplayableDFDElement(int id, int row, int col, DFDElement* dfdElement);
 
     DisplayableDFDElement(){}
 
@@ -39,7 +39,7 @@ public:
         return this->item;
     }
 
-    inline DFDElement getElement() {
+    inline DFDElement* getElement() {
         return this->element;
     }
 
@@ -56,7 +56,7 @@ private:
     int id;
     int row;
     int col;
-    DFDElement element;
+    DFDElement* element;
     QGraphicsItem* item = 0;
     bool selected = false;
 };
