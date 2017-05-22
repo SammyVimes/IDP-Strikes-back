@@ -7,14 +7,30 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     cbf = new CheckBoxFabric(this);
+    connect(ui->birthDateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(validate()));
+    connect(ui->fioLineEdit, SIGNAL(textChanged(QString)), this, SLOT(validate()));
+
     addPill(Pill("Бисептол", 10, true, 0b011, "2 таб"));
     addFood(Food("Макароны по-флотски", "макароны, фарш из свинины, лук", 3, 4));
+
+    ui->birthDateEdit->setDateRange(QDate(1940, 1, 1), QDate::currentDate().addMonths(-3));
+    validate();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
     delete cbf;
+}
+
+void MainWindow::validate()
+{
+    bool valid = true;
+    QRegExp re("\\w+\\s+\\w+\\s+\\w{2,}");
+    if (!re.exactMatch(ui->fioLineEdit->text())) {
+        valid = false;
+    }
+    ui->createPlanPushButton->setEnabled(valid);
 }
 
 void MainWindow::on_createPlanPushButton_clicked()

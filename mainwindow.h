@@ -22,6 +22,9 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public slots:
+    void validate();
+
 private slots:
     void on_createPlanPushButton_clicked();
     void on_addPillPushButton_clicked();
