@@ -29,9 +29,21 @@ void MainWindow::validate()
     bool valid = true;
     QRegExp re("\\w+\\s+\\w+\\s+\\w{2,}");
     if (!re.exactMatch(ui->fioLineEdit->text())) {
-        valid = false;
+        ui->statusBar->showMessage("ФИО введено неверно.");
+        ui->createPlanPushButton->setEnabled(false);
+        return;
     }
-    ui->createPlanPushButton->setEnabled(valid);
+
+    //TODO не используется
+    if (ui->birthDateEdit->date() < QDate(1940, 1, 1)) {
+        ui->statusBar->showMessage("Дата введена неверно.");
+        ui->createPlanPushButton->setEnabled(false);
+        return;
+    }
+
+    ui->statusBar->showMessage("Готово к созданию плана питания");
+    ui->createPlanPushButton->setEnabled(true);
+    return;
 }
 
 void MainWindow::showHelp()

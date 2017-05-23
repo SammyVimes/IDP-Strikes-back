@@ -115,6 +115,12 @@
                <height>18</height>
               </size>
              </property>
+             <property name="toolTip">
+              <string>Фамилия Имя Отчество через пробел</string>
+             </property>
+             <property name="accessibleDescription">
+              <string>Фамилия Имя Отчество через пробел</string>
+             </property>
             </widget>
            </item>
           </layout>
@@ -142,6 +148,12 @@
            </item>
            <item>
             <widget class="QDateEdit" name="birthDateEdit">
+             <property name="toolTip">
+              <string>Дата рождения</string>
+             </property>
+             <property name="accessibleDescription">
+              <string>Дата рождения</string>
+             </property>
              <property name="maximumDate">
               <date>
                <year>2030</year>
@@ -364,7 +376,14 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="forbiddenLineEdit"/>
+          <widget class="QLineEdit" name="forbiddenLineEdit">
+           <property name="toolTip">
+            <string>Перечислите, разделяя запятыми, продукты, запрещенные к употреблению</string>
+           </property>
+           <property name="accessibleDescription">
+            <string>Перечислите, разделяя запятыми, продукты, запрещенные к употреблению</string>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QLabel" name="label_6">
@@ -433,6 +452,12 @@
                  <height>16777215</height>
                 </size>
                </property>
+               <property name="toolTip">
+                <string>Доступные лекарства</string>
+               </property>
+               <property name="accessibleDescription">
+                <string>Доступные лекарства</string>
+               </property>
                <property name="verticalScrollBarPolicy">
                 <enum>Qt::ScrollBarAlwaysOn</enum>
                </property>
@@ -465,6 +490,12 @@
              </item>
              <item>
               <widget class="QPushButton" name="addPillPushButton">
+               <property name="toolTip">
+                <string>Добавить новое лекарство</string>
+               </property>
+               <property name="accessibleDescription">
+                <string>Добавить новое лекарство</string>
+               </property>
                <property name="text">
                 <string>Добавить</string>
                </property>
@@ -576,6 +607,12 @@
                <height>70</height>
               </size>
              </property>
+             <property name="toolTip">
+              <string>Доступные блюда</string>
+             </property>
+             <property name="accessibleDescription">
+              <string>Доступные блюда</string>
+             </property>
              <property name="verticalScrollBarPolicy">
               <enum>Qt::ScrollBarAlwaysOn</enum>
              </property>
@@ -608,6 +645,12 @@
            </item>
            <item>
             <widget class="QPushButton" name="addFoodPushButton">
+             <property name="toolTip">
+              <string>Добавить новое блюдо</string>
+             </property>
+             <property name="accessibleDescription">
+              <string>Добавить новое блюдо</string>
+             </property>
              <property name="text">
               <string>Добавить</string>
              </property>
@@ -647,6 +690,12 @@
     </item>
     <item>
      <widget class="QPushButton" name="createPlanPushButton">
+      <property name="toolTip">
+       <string>Создать и открыть новый план</string>
+      </property>
+      <property name="accessibleDescription">
+       <string>Создать и открыть новый план</string>
+      </property>
       <property name="text">
        <string>Создать план</string>
       </property>
