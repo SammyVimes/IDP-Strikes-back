@@ -70,7 +70,7 @@ void MainWindow::on_createPlanPushButton_clicked()
 
     EatingProcess* p2 = new EatingProcess(2);
     p2->setFood(pizz);
-    vector<Pill> before = {asspirine};
+    vector<Pill> before = {aspirine};
     vector<Pill> after = {nimesil};
     p2->setMedsAfterEating(after);
     p2->setMedsBeforeEating(before);
