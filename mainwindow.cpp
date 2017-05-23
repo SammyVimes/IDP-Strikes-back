@@ -34,6 +34,11 @@ void MainWindow::validate()
     ui->createPlanPushButton->setEnabled(valid);
 }
 
+void MainWindow::showHelp()
+{
+    QMessageBox::about(this, "Помощь", "Оно должно работать!");
+}
+
 void MainWindow::on_createPlanPushButton_clicked()
 {
     PlanWindow *pw = new PlanWindow(this);

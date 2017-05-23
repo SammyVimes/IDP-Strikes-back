@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QMessageBox>
 #include "food.h"
 #include "planwindow.h"
 #include "addpilldialog.h"
@@ -24,6 +25,8 @@ public:
 
 public slots:
     void validate();
+    void showHelp();
+
 
 private slots:
     void on_createPlanPushButton_clicked();

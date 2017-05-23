@@ -7,6 +7,14 @@ PlanWindow::PlanWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    connect(ui->closePlanAction, SIGNAL(triggered(bool)), parent, SLOT(raise()));
+    connect(ui->closePlanAction, SIGNAL(triggered(bool)), this, SLOT(close()));
+
+    connect(ui->helpAction, SIGNAL(triggered(bool)), parent, SLOT(showHelp()));
+
+    connect(ui->exitAction, SIGNAL(triggered(bool)), this, SLOT(close()));
+    connect(ui->exitAction, SIGNAL(triggered(bool)), parent, SLOT(close()));
+
     QGraphicsScene* scene = new QGraphicsScene(this);
     this->ui->graphicsView->setScene(scene);
 
