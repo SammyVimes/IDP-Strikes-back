@@ -32,7 +32,9 @@ public:
 
     void setMedsAfterEating(const vector<Pill> &value);
 
-
+    static DFDElement* deserialize (QDomNode node) {
+        return new DFDElement();
+    }
 
 private:
     vector<Pill> medsBeforeEating;

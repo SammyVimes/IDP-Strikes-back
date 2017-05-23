@@ -2,6 +2,7 @@
 #define DFDELEMENT_H
 
 #include <iostream>
+#include <QtXml>
 
 class DFDElement
 {
@@ -17,7 +18,13 @@ public:
     }
 
     virtual void printToStream(std::ostream& os) const {
+        os << "<dfd>" << endl;
+        os << "<type>" << QString::number(type).toStdString() << "</type>" << endl;
+        os << "</dfd>";
+    }
 
+    static DFDElement* deserialize (QDomNode node) {
+        return new DFDElement();
     }
 
     friend std::ostream& operator<< (std::ostream& os, const DFDElement* dt);

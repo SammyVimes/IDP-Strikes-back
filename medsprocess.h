@@ -28,6 +28,10 @@ public:
 
     void setPills(const vector<Pill> &value);
 
+    static DFDElement* deserialize (QDomNode node) {
+        return new DFDElement();
+    }
+
 private:
     vector<QString> rejectedFood;
     vector<Pill> pills;

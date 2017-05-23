@@ -3,7 +3,11 @@
 
 #include "directedgraph.h"
 #include "dfdelement.h"
+#include "cookingprocess.h"
+#include "medsprocess.h"
+#include "eatingprocess.h"
 #include <iostream>
+#include <QtXml>
 
 
 using namespace std;
@@ -28,6 +32,7 @@ public:
     void setName(const QString &value);
 
     void serialize(ostream& os);
+    static void deserialize(istream& is);
 
 private:
     DirectedGraph<DFDElement*> *graph;

@@ -61,6 +61,16 @@ PlanWindow::PlanWindow(Plan *plan, QWidget *parent) :
     }
     QTextStream ts( stdout );
     ts << QString::fromStdString(ss.str());
+    file.close();
+
+    if ( file.open(QIODevice::ReadOnly) )
+    {
+        QTextStream stream( &file );
+        string s = stream.readAll().toStdString();
+        stringstream ss;
+        ss << s;
+        Plan::deserialize(ss);
+    }
 }
 
 PlanWindow::~PlanWindow()
