@@ -51,6 +51,7 @@ class AllocatorException: public Exception
  };
 
 
+namespace MDP {
 template <class V>
 class DirectedGraph
 {
@@ -391,6 +392,7 @@ std::ostream& operator<< (std::ostream& os, const DirectedGraph<V2>& dt) {
 template <typename V2>
 std::istream& operator>> (std::istream& is, DirectedGraph<V2>& dt) {
 
+}
 }
 
 #endif // DIRECTEDGRAPH_H

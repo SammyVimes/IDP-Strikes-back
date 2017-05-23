@@ -18,6 +18,8 @@
 #include "pill.h"
 #include "food.h"
 
+using namespace MDP;
+
 namespace Ui {
 class PlanWindow;
 }
