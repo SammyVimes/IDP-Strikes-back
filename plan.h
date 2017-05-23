@@ -6,6 +6,7 @@
 #include "cookingprocess.h"
 #include "medsprocess.h"
 #include "eatingprocess.h"
+#include <map>
 #include <iostream>
 #include <QtXml>
 
@@ -32,7 +33,7 @@ public:
     void setName(const QString &value);
 
     void serialize(ostream& os);
-    static void deserialize(istream& is);
+    static Plan *deserialize(istream& is);
 
 private:
     DirectedGraph<DFDElement*> *graph;

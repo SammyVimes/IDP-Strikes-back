@@ -18,37 +18,13 @@ PlanWindow::PlanWindow(Plan *plan, QWidget *parent) :
     QGraphicsScene* scene = new QGraphicsScene(this);
     this->ui->graphicsView->setScene(scene);
 
-    DirectedGraph<int>* graph = new DirectedGraph<int>;
-    graph->addNode(50);
-    using MNode = DirectedGraph<int>::Node;
-    MNode* node1FromGraph1 = graph->getNodes()[0];
-    graph->addNode(node1FromGraph1, 1337);
-
-    DirectedGraph<int>* graph2 = new DirectedGraph<int>;
-    graph2->addNode(228);
-    MNode* node1FromGraph2 = graph2->getNodes()[0];
-    graph2->addNode(node1FromGraph2, 1588);
-
-    try {
-        graph->addNode(node1FromGraph2, 337);
-        exit(0);
-    } catch (BadGraphException& e) {
-
-    }
-    try {
-        graph->linkNodes(node1FromGraph1, node1FromGraph2);
-        exit(0);
-    } catch (BadGraphException& e) {
-
-    }
-
-    delete graph;
-    delete graph2;
-
     this->plan = plan;
 
 
+    // отрисуем
     drawDFD(true);
+
+    // сериализуем
     stringstream ss;
     plan->serialize(ss);
 
@@ -58,18 +34,30 @@ PlanWindow::PlanWindow(Plan *plan, QWidget *parent) :
     {
         QTextStream stream( &file );
         stream << QString::fromStdString(ss.str());
+        file.close();
     }
-    QTextStream ts( stdout );
-    ts << QString::fromStdString(ss.str());
-    file.close();
 
+    // десериализуем
     if ( file.open(QIODevice::ReadOnly) )
     {
         QTextStream stream( &file );
         string s = stream.readAll().toStdString();
         stringstream ss;
         ss << s;
-        Plan::deserialize(ss);
+        Plan* deserialized = Plan::deserialize(ss);
+        file.close();
+
+        // сериализуем снова, чтобы найти отличия
+        QString newFileName="DataDeserialized.txt";
+        QFile newFile( newFileName );
+        if ( newFile.open(QIODevice::ReadWrite) )
+        {
+            QTextStream nStream( &newFile );
+            stringstream nSS;
+            deserialized->serialize(nSS);
+            nStream << QString::fromStdString(nSS.str());
+            newFile.close();
+        }
     }
 }
 

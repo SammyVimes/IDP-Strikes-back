@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <QStringList>
+#include <QtXml>
 
 using namespace std;
 
@@ -33,6 +34,28 @@ public:
 
     int amount() const;
     void setAmount(int amount);
+
+    static Food deserialize(QDomNode node) {
+        QDomNode fElem = node.firstChild();
+        QString name;
+        QString comp;
+        int expirationDate;
+        int amount;
+        while (!fElem.isNull()) {
+            QString tagName = fElem.nodeName();
+            if (tagName == "name") {
+               name = fElem.firstChild().nodeValue();
+            } else if (tagName == "comp") {
+                comp = fElem.firstChild().nodeValue();
+            } else if (tagName == "expiration") {
+                expirationDate = fElem.firstChild().nodeValue().toInt();
+            } else if (tagName == "amount") {
+                amount = fElem.firstChild().nodeValue().toInt();
+            }
+            fElem = fElem.nextSibling();
+        }
+        return Food(name, comp, expirationDate, amount);
+    }
 
     void printStream(ostream& os) const {
         os << "<food>";

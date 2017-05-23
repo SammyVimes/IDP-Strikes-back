@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <iostream>
+#include <QtXml>
 
 using namespace std;
 
@@ -30,6 +31,31 @@ public:
     int getLifeTime() const;
     void setLifeTime(int lifeTime);
 
+    static Pill deserialize(QDomNode node) {
+        QDomNode fElem = node.firstChild();
+        QString name;
+        int lifeTime;
+        bool beforeFlag;
+        int takeTimeMask;
+        QString amount;
+        while (!fElem.isNull()) {
+            QString tagName = fElem.nodeName();
+            if (tagName == "name") {
+               name = fElem.firstChild().nodeValue();
+            } else if (tagName == "amount") {
+                amount = fElem.firstChild().nodeValue();
+            } else if (tagName == "beforeFlag") {
+                beforeFlag = fElem.firstChild().nodeValue().toInt() == 1;
+            } else if (tagName == "lifeTime") {
+                lifeTime = fElem.firstChild().nodeValue().toInt();
+            } else if (tagName == "takeTimeMask") {
+                takeTimeMask = fElem.firstChild().nodeValue().toInt();
+            }
+            fElem = fElem.nextSibling();
+        }
+        return Pill(name, lifeTime, beforeFlag, takeTimeMask, amount);
+    }
+
     void printStream(ostream& os) {
         os << "<pill>" << endl;
         os << "<name>" << endl;
@@ -39,7 +65,7 @@ public:
         os << QString::number(m_lifeTime).toStdString() << endl;
         os << "</lifeTime>" << endl;
         os << "<beforeFlag>" << endl;
-        os << m_beforeFlag << endl;
+        os << QString::number(m_beforeFlag ? 1 : 0).toStdString() << endl;
         os << "</beforeFlag>" << endl;
         os << "<takeTimeMask>" << endl;
         os << QString::number(m_takeTimeMask).toStdString() << endl;

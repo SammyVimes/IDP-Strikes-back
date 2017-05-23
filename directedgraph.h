@@ -113,6 +113,10 @@ public:
             return this->nodeId;
         }
 
+        inline int setId(int value) {
+            this->nodeId = value;
+        }
+
         DirectedGraph* getGraph() {
             return graph;
         }

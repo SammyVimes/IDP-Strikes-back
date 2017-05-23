@@ -70,6 +70,8 @@ void Plan::serialize(ostream &os)
 DirectedGraph<DFDElement*>* deserializeGraph(QDomNode graph) {
     QDomNode graphElement = graph.firstChild();
     DirectedGraph<DFDElement*>* dfd = new DirectedGraph<DFDElement*>;
+    using DNode = DirectedGraph<DFDElement*>::Node;
+    std::map <int, DNode*> elMap;
 
     // <nodes></nodes><outgoing></outgoing>
 
@@ -88,7 +90,7 @@ DirectedGraph<DFDElement*>* deserializeGraph(QDomNode graph) {
                  while (!nodeElement.isNull()) {
                      QString neTag = nodeElement.nodeName();
                      if (neTag == "id") {
-                        nodeId = nodeElement.nodeValue().toInt();
+                        nodeId = nodeElement.firstChild().nodeValue().toInt();
                      } else if (neTag == "value") {
                         QDomNode valueNode = nodeElement.firstChild();
                         if (!valueNode.isNull()) {
@@ -107,17 +109,51 @@ DirectedGraph<DFDElement*>* deserializeGraph(QDomNode graph) {
                      nodeElement = nodeElement.nextSibling();
                  }
 
-                 graphNode = graphNode.nextSibling();
+                DNode* nd = dfd->addNode(dfdElement);
+                nd->setId(nodeId);
+                graphNode = graphNode.nextSibling();
+                elMap[nd->getId()] = nd;
              }
         // <outgoing>
         } else if (tagName == "outgoing") {
+            QDomNode outNode = graphElement.firstChild();
+            // <node></node>
+            while (!outNode.isNull()) {
+                QDomNode conNode = outNode.firstChild();
 
+                int id = -1;
+                vector<int> ids;
+                //<id></id> <connections></connections>
+                while (!conNode.isNull()) {
+                    QString tName = conNode.nodeName();
+                    if (tName == "id") {
+                        id = conNode.firstChild().nodeValue().toInt();
+                    } else if (tName == "connections") {
+                        QDomNode inNode = conNode.firstChild();
+
+                        // <id></id>
+                        while (!inNode.isNull()) {
+                            ids.push_back(inNode.firstChild().nodeValue().toInt());
+                            inNode = inNode.nextSibling();
+                        }
+                    }
+
+                    conNode = conNode.nextSibling();
+                }
+
+                std::for_each(ids.begin(), ids.end(), [id, dfd, &elMap](int conId) {
+                    dfd->linkNodes(elMap[id], elMap[conId]);
+                });
+
+                outNode = outNode.nextSibling();
+            }
         }
         graphElement = graphElement.nextSibling();
     }
+    return dfd;
 }
 
-void Plan::deserialize(istream &is)
+Plan* Plan::deserialize(istream &is)
 {
     std::string str(std::istreambuf_iterator<char>(is), {});
     QString qStr = QString::fromStdString(str);
@@ -129,13 +165,13 @@ void Plan::deserialize(istream &is)
         while (!planElement.isNull()) {
             QString tagName = planElement.nodeName();
             if (tagName == "name") {
-                plan->setName(planElement.nodeValue());
+                plan->setName(planElement.firstChild().nodeValue());
             } else if (tagName == "birthTimestamp") {
-                plan->setBirthTimestamp(planElement.nodeValue().toInt());
+                plan->setBirthTimestamp(planElement.firstChild().nodeValue().toInt());
             } else if (tagName == "days") {
-                plan->setDays(planElement.nodeValue().toInt());
+                plan->setDays(planElement.firstChild().nodeValue().toInt());
             } else if (tagName == "foodChangeThreshold") {
-                plan->setFoodChangeThreshold(planElement.nodeValue().toInt());
+                plan->setFoodChangeThreshold(planElement.firstChild().nodeValue().toInt());
             } else if (tagName == "graph") {
                 DirectedGraph<DFDElement*>* graph = deserializeGraph(planElement);
                 plan->setGraph(graph);
@@ -143,6 +179,6 @@ void Plan::deserialize(istream &is)
             planElement = planElement.nextSibling();
         }
     }
-
+    return plan;
 }
 

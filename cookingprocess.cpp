@@ -10,6 +10,20 @@ void CookingProcess::setMenu(const vector<Food> &value)
     menu = value;
 }
 
+DFDElement *CookingProcess::deserialize(QDomNode node) {
+    QDomNode cookElem = node.firstChild();
+    CookingProcess* cookingProcess = new CookingProcess();
+    while (!cookElem.isNull()) {
+        QString nodeName = cookElem.nodeName();
+        if (nodeName == "menu") {
+            auto food = deserializeFood(cookElem);
+            cookingProcess->setMenu(food);
+        }
+        cookElem = cookElem.nextSibling();
+    }
+    return cookingProcess;
+}
+
 
 void CookingProcess::printToStream(ostream &os) const
 {

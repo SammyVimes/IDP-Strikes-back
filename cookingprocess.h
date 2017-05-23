@@ -23,9 +23,7 @@ public:
     vector<Food> getMenu() const;
     void setMenu(const vector<Food> &value);
 
-    static DFDElement* deserialize (QDomNode node) {
-        return new DFDElement();
-    }
+    static DFDElement* deserialize (QDomNode node);
 
 private:
     vector<Food> menu;

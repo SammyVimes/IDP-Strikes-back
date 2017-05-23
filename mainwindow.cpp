@@ -55,7 +55,8 @@ void MainWindow::on_createPlanPushButton_clicked()
 {
 
     Pill nimesil(QString("Нимесил"), 5, true, 1, QString::number(5));
-    Pill aspirine(QString("Aспирин"), 5, true, 1, QString::number(5));
+    Pill aspirine(QString("Aспирин"), 5, true, 1, QString::number(11));
+    Pill pinosol(QString("Пиносол"), 5, true, 1, QString::number(9));
     Food pizz(QString("Пепперони"), QString("Pickle x1, Box x1"), 15, 1);
 
 
@@ -75,13 +76,18 @@ void MainWindow::on_createPlanPushButton_clicked()
     p2->setMedsAfterEating(after);
     p2->setMedsBeforeEating(before);
 
+
+    MedsProcess* p3 = new MedsProcess(2);
+    p3->setPills({pinosol});
+    p3->setRejectedFood({"Мука", "Перец", "Картошка"});
+
     DNode* n11 = dfd->addNode(cooking, p);
     DNode* n12 = dfd->addNode(cooking, new DFDElement(2));
     DNode* n13 = dfd->addNode(n11, new DFDElement(2));
     DNode* n21 = dfd->addNode(n13, new DFDElement(2));
     DNode* n22 = dfd->addNode(n12, p2);
     DNode* n23 = dfd->addNode(doctor, new DFDElement(2));
-    DNode* n31 = dfd->addNode(n23, new DFDElement(2));
+    DNode* n31 = dfd->addNode(n23, p3);
     DNode* n32 = dfd->addNode(n31, new DFDElement(2));
     DNode* n33 = dfd->addNode(n32, new DFDElement(2));
     dfd->linkNodes(doctor, n11);
@@ -93,6 +99,10 @@ void MainWindow::on_createPlanPushButton_clicked()
 
     Plan* plan = new Plan();
     plan->setGraph(dfd);
+    plan->setBirthTimestamp(100);
+    plan->setName("Иванов Иван Иванович");
+    plan->setFoodChangeThreshold(1000);
+    plan->setDays(1337);
 
     PlanWindow *pw = new PlanWindow(plan, this);
     pw->show();
