@@ -10,6 +10,7 @@
 #include "pillcheckbox.h"
 #include "foodcheckbox.h"
 #include "checkboxfabric.h"
+#include "plan.h"
 
 namespace Ui {
 class MainWindow;

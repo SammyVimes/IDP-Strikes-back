@@ -53,7 +53,48 @@ void MainWindow::showHelp()
 
 void MainWindow::on_createPlanPushButton_clicked()
 {
-    PlanWindow *pw = new PlanWindow(this);
+
+    Pill nimesil(QString("Нимесил"), 5, true, 1, QString::number(5));
+    Pill aspirine(QString("Aспирин"), 5, true, 1, QString::number(5));
+    Food pizz(QString("Пепперони"), QString("Pickle x1, Box x1"), 15, 1);
+
+
+    using DNode = DirectedGraph<DFDElement*>::Node;
+    DirectedGraph<DFDElement*>* dfd = new DirectedGraph<DFDElement*>;
+    DNode* cooking = dfd->addNode(new DFDElement(0));
+    DNode* doctor = dfd->addNode(new DFDElement(1));
+    CookingProcess *p = new CookingProcess(2);
+    std::vector<Food> vec;
+    vec.push_back(pizz);
+    p->setMenu(vec);
+
+    EatingProcess* p2 = new EatingProcess(2);
+    p2->setFood(pizz);
+    vector<Pill> before = {asspirine};
+    vector<Pill> after = {nimesil};
+    p2->setMedsAfterEating(after);
+    p2->setMedsBeforeEating(before);
+
+    DNode* n11 = dfd->addNode(cooking, p);
+    DNode* n12 = dfd->addNode(cooking, new DFDElement(2));
+    DNode* n13 = dfd->addNode(n11, new DFDElement(2));
+    DNode* n21 = dfd->addNode(n13, new DFDElement(2));
+    DNode* n22 = dfd->addNode(n12, p2);
+    DNode* n23 = dfd->addNode(doctor, new DFDElement(2));
+    DNode* n31 = dfd->addNode(n23, new DFDElement(2));
+    DNode* n32 = dfd->addNode(n31, new DFDElement(2));
+    DNode* n33 = dfd->addNode(n32, new DFDElement(2));
+    dfd->linkNodes(doctor, n11);
+    dfd->linkNodes(doctor, n13);
+    dfd->linkNodes(doctor, n21);
+    dfd->linkNodes(doctor, n31);
+    dfd->linkNodes(n22, n32);
+    dfd->linkNodes(doctor, n33);
+
+    Plan* plan = new Plan();
+    plan->setGraph(dfd);
+
+    PlanWindow *pw = new PlanWindow(plan, this);
     pw->show();
     pw->raise();
 }

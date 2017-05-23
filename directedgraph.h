@@ -358,7 +358,7 @@ std::ostream& operator<< (std::ostream& os, const DirectedGraph<V2>& dt) {
     typedef typename DirectedGraph<V2>::Node NODE;
     size_t edgesCounter = 0;
 
-    os << "<plan>" << endl;
+    os << "<graph>" << endl;
 
     os << "<nodes>" << endl;
 
@@ -379,7 +379,7 @@ std::ostream& operator<< (std::ostream& os, const DirectedGraph<V2>& dt) {
     });
     os << "</outgoing>" << endl;
 
-    os << "</plan>" << endl;
+    os << "</graph>" << endl;
 
     return os;
 }

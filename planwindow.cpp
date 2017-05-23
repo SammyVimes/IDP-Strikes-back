@@ -1,7 +1,7 @@
 #include "planwindow.h"
 #include "ui_planwindow.h"
 
-PlanWindow::PlanWindow(QWidget *parent) :
+PlanWindow::PlanWindow(Plan *plan, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::PlanWindow)
 {
@@ -45,51 +45,12 @@ PlanWindow::PlanWindow(QWidget *parent) :
     delete graph;
     delete graph2;
 
-    testGraph();
-}
-
-void PlanWindow::testGraph() {
-    Pill nimesil(QString("Нимесил"), 5, true, 1, QString::number(5));
-    Pill asspirine(QString("Assпирин"), 5, true, 1, QString::number(5));
-    Food pizz(QString("Пепперони"), QString("Pickle x1, Box x1"), 15, 1);
+    this->plan = plan;
 
 
-    using DNode = DirectedGraph<DFDElement*>::Node;
-    DirectedGraph<DFDElement*>* dfd = new DirectedGraph<DFDElement*>;
-    DNode* cooking = dfd->addNode(new DFDElement(0));
-    DNode* doctor = dfd->addNode(new DFDElement(1));
-    CookingProcess *p = new CookingProcess(2);
-    std::vector<Food> vec;
-    vec.push_back(pizz);
-    p->setMenu(vec);
-
-    EatingProcess* p2 = new EatingProcess(2);
-    p2->setFood(pizz);
-    vector<Pill> before = {asspirine};
-    vector<Pill> after = {nimesil};
-    p2->setMedsAfterEating(after);
-    p2->setMedsBeforeEating(before);
-
-    DNode* n11 = dfd->addNode(cooking, p);
-    DNode* n12 = dfd->addNode(cooking, new DFDElement(2));
-    DNode* n13 = dfd->addNode(n11, new DFDElement(2));
-    DNode* n21 = dfd->addNode(n13, new DFDElement(2));
-    DNode* n22 = dfd->addNode(n12, p2);
-    DNode* n23 = dfd->addNode(doctor, new DFDElement(2));
-    DNode* n31 = dfd->addNode(n23, new DFDElement(2));
-    DNode* n32 = dfd->addNode(n31, new DFDElement(2));
-    DNode* n33 = dfd->addNode(n32, new DFDElement(2));
-    dfd->linkNodes(doctor, n11);
-    dfd->linkNodes(doctor, n13);
-    dfd->linkNodes(doctor, n21);
-    dfd->linkNodes(doctor, n31);
-    dfd->linkNodes(n22, n32);
-    dfd->linkNodes(doctor, n33);
-
-    this->graph = dfd;
     drawDFD(true);
     stringstream ss;
-    ss << *this->graph;
+    plan->serialize(ss);
 
     QString filename="Data.txt";
     QFile file( filename );
@@ -159,7 +120,7 @@ void PlanWindow::drawDFD(bool rebuildMap)
     QDate curDate = QDate::currentDate();
     int curDay = 1;
 
-    DirectedGraph<DFDElement*>* graph = this->graph;
+    DirectedGraph<DFDElement*>* graph = this->plan->getGraph();
     std::for_each(graph->begin(), graph->end(), [this, rebuildMap, &curDate, &curDay, offsetLeft, padding, elemSize, colOffset, &row, &col, graph, scene](DNode* n) {
         int type = n->getValue()->getType();
 

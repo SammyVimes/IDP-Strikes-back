@@ -7,6 +7,7 @@
 #include "displayabledfdelement.h"
 #include "directedgraph.h"
 #include "dfdelement.h"
+#include "plan.h"
 #include <QDate>
 #include "cookingprocess.h"
 #include "eatingprocess.h"
@@ -26,15 +27,15 @@ class PlanWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit PlanWindow(QWidget *parent = 0);
+    explicit PlanWindow(Plan* plan, QWidget *parent = 0);
+
     ~PlanWindow();
     void drawDFD(bool rebuildMap);
 
 private:
     Ui::PlanWindow *ui;
-    DirectedGraph<DFDElement*> *graph;
+    Plan* plan;
     std::map <int, DisplayableDFDElement*> elMap;
-    void testGraph();
 };
 
 #endif // PLANWINDOW_H
