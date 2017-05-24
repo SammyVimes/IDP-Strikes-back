@@ -328,9 +328,9 @@ void MainWindow::on_createPlanPushButton_clicked()
     Plan* plan = new Plan();
     plan->setGraph(dfd);
     plan->setBirthTimestamp(100);
-    plan->setName("Иванов Иван Иванович");
-    plan->setFoodChangeThreshold(1000);
-    plan->setDays(1337);
+    plan->setName(ui->fioLineEdit->text());
+    plan->setFoodChangeThreshold(boreTime);
+    plan->setDays(planForDays);
 
     PlanWindow *pw = new PlanWindow(plan, this);
     pw->show();
