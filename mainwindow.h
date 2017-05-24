@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QMessageBox>
+#include <fstream>
 #include "food.h"
 #include "planwindow.h"
 #include "addpilldialog.h"
@@ -28,6 +29,8 @@ public slots:
     void validate();
     void showHelp();
 
+protected:
+    void closeEvent(QCloseEvent *e);
 
 private slots:
     void on_createPlanPushButton_clicked();
@@ -43,6 +46,7 @@ private:
     AddPillDialog *apd = NULL;
     AddFoodDialog *afd = NULL;
     CheckBoxFabric *cbf = NULL;
+    void checkXMLPresent();
 };
 
 #endif // MAINWINDOW_H

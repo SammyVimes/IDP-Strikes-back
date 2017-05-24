@@ -6,16 +6,20 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    cbf = new CheckBoxFabric(this);
+    cbf = new CheckBoxFabric(ui->pillsVerticalLayout->parentWidget(), ui->foodVerticalLayout->parentWidget());
 
     connect(ui->birthDateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(validate()));
     connect(ui->fioLineEdit, SIGNAL(textChanged(QString)), this, SLOT(validate()));
 
     addPill(Pill("Бисептол", 10, true, 0b011, "2 таб"));
+    addPill(Pill("Бисептол2", 10, true, 0b011, "2 таб"));
     addFood(Food("Макароны по-флотски", "макароны, фарш из свинины, лук", 3, 4));
+    addFood(Food("Макароны по-флотски2", "макароны, фарш из свинины, лук", 3, 4));
 
     ui->birthDateEdit->setDateRange(QDate(1940, 1, 1), QDate::currentDate().addMonths(-3));
     validate();
+
+    checkXMLPresent();
 }
 
 MainWindow::~MainWindow()
@@ -49,6 +53,51 @@ void MainWindow::validate()
 void MainWindow::showHelp()
 {
     QMessageBox::about(this, "Помощь", "Оно должно работать!");
+}
+
+void MainWindow::closeEvent(QCloseEvent *e)
+{
+    bool errFlag = false;
+    QList<Food *> ftoOut;
+    QObjectList food = ui->foodVerticalLayout->parentWidget()->children();
+    for (QObject *o : food)
+    {
+        Food *f = (Food *) o->property("val").value<void *>();
+        if (f != NULL)
+        {
+            ftoOut.append(f);
+        }
+    }
+
+    QList<Pill *> ptoOut;
+    QObjectList pills = ui->foodVerticalLayout->parentWidget()->children();
+    for (QObject *o : pills)
+    {
+        Pill *p = (Pill *) o->property("val").value<void *>();
+        if (p != NULL)
+        {
+            ptoOut.append(p);
+        }
+    }
+
+    //TODO Serialize ftoOut and ptoOut
+
+    if (errFlag)
+    {
+        int res = QMessageBox::question(this, "Ошибка при записи файлов", "Некоторые данные не были сохранены. Уверены, что хотите выйти?", QMessageBox::Yes | QMessageBox::No);
+        if (res == QMessageBox::Yes)
+        {
+            e->accept();
+        }
+        else
+        {
+            e->ignore();
+        }
+    }
+    else
+    {
+        e->accept();
+    }
 }
 
 void MainWindow::on_createPlanPushButton_clicked()
@@ -143,6 +192,64 @@ void MainWindow::addPill(Pill p)
     connect(ch, SIGNAL(refreshDescription()), this, SLOT(refreshPillDesc()));
     connect(ch, SIGNAL(clearDescription()), ui->pillPlainTextEdit, SLOT(clear()));
     ui->pillsVerticalLayout->addWidget(ch);
+}
+
+void MainWindow::checkXMLPresent()
+{
+    //TODO Get pills and food from pills.xml and food.xml
+    //TODO Use addPill() and addFood() to add objects
+    QFile pfile("pills.xml");
+    QFileInfo fi(pfile);
+    if (!pfile.open(QIODevice::ReadOnly))
+    {
+        QMessageBox::warning(this, "Не могу открыть pills.xml", "Ошибка при открытии " + fi.absoluteFilePath());
+    }
+    else
+    {
+        QDomDocument doc("pills");
+        if (!doc.setContent(&pfile))
+        {
+            pfile.close();
+            QMessageBox::warning(this, "Не могу открыть pills.xml", "Ошибка при открытии " + fi.absoluteFilePath());
+        }
+        else
+        {
+            QDomElement docElem = doc.documentElement();
+            QDomNode n = docElem.firstChild();
+            while(!n.isNull())
+            {
+                Pill::deserialize(n);
+                n = n.nextSibling();
+            }
+            pfile.close();
+        }
+    }
+
+    QFile ffile("food.xml");
+    QFileInfo ffi(ffile);
+    if (!ffile.open(QIODevice::ReadOnly))
+    {
+        QMessageBox::warning(this, "Не могу открыть food.xml", "Ошибка при открытии " + ffi.absoluteFilePath());
+    }
+    else
+    {
+        QDomDocument doc("food");
+        if (!doc.setContent(&ffile)) {
+            ffile.close();
+            QMessageBox::warning(this, "Не могу открыть food.xml", "Ошибка при открытии " + ffi.absoluteFilePath());
+            return;
+        }
+        ffile.close();
+
+        QDomElement docElem = doc.documentElement();
+        QDomNode n = docElem.firstChild();
+        while(!n.isNull())
+        {
+            Food::deserialize(n);
+            n = n.nextSibling();
+        }
+        ffile.close();
+    }
 }
 
 void MainWindow::refreshFoodDesc()

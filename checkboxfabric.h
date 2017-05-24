@@ -13,11 +13,12 @@
 class CheckBoxFabric
 {
 public:
-    CheckBoxFabric(QWidget *parent);
+    CheckBoxFabric(QWidget *p_parent, QWidget *f_parent);
     QCheckBox *getCheckBox(Pill p);
     QCheckBox *getCheckBox(Food f);
 private:
-    QWidget *m_parent;
+    QWidget *m_fparent;
+    QWidget *m_pparent;
 };
 
 #endif // CHECKBOXFABRIC_H
