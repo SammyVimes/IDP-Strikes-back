@@ -12,11 +12,11 @@ class CookingProcess : public DFDElement
 {
 public:
 
-    CookingProcess(int type):DFDElement(type) {
+    CookingProcess(int type):DFDElement(0) {
 
     }
 
-    CookingProcess():DFDElement() {
+    CookingProcess():DFDElement(0) {
 
     }
 

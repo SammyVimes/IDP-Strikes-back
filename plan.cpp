@@ -182,3 +182,23 @@ Plan* Plan::deserialize(istream &is)
     return plan;
 }
 
+EatingProcess *Plan::getEating() const
+{
+    return eating;
+}
+
+void Plan::setEating(EatingProcess *value)
+{
+    eating = value;
+}
+
+MedsProcess *Plan::getMeds() const
+{
+    return meds;
+}
+
+void Plan::setMeds(MedsProcess *value)
+{
+    meds = value;
+}
+

@@ -31,6 +31,18 @@ public:
     int getLifeTime() const;
     void setLifeTime(int lifeTime);
 
+    inline bool breakfast() {
+        return m_takeTimeMask & (1 << 2);
+    }
+
+    inline bool lunch() {
+        return m_takeTimeMask & (1 << 1);
+    }
+
+    inline bool dinner() {
+        return m_takeTimeMask & 1;
+    }
+
     static Pill deserialize(QDomNode node) {
         QDomNode fElem = node.firstChild();
         QString name;

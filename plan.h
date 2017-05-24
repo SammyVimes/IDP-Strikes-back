@@ -36,8 +36,16 @@ public:
     void serialize(ostream& os);
     static Plan *deserialize(istream& is);
 
+    EatingProcess *getEating() const;
+    void setEating(EatingProcess *value);
+
+    MedsProcess *getMeds() const;
+    void setMeds(MedsProcess *value);
+
 private:
     DirectedGraph<DFDElement*> *graph;
+    EatingProcess* eating;
+    MedsProcess* meds;
     int days;
     int foodChangeThreshold;
     int birthTimestamp;

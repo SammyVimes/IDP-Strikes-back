@@ -12,11 +12,11 @@ class MedsProcess : public DFDElement
 {
 public:
 
-    MedsProcess(int type):DFDElement(type) {
+    MedsProcess(int type):DFDElement(1) {
 
     }
 
-    MedsProcess():DFDElement() {
+    MedsProcess():DFDElement(1) {
 
     }
 
