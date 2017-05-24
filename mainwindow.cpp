@@ -52,7 +52,7 @@ void MainWindow::showHelp()
 
 void MainWindow::getPillList(QList<Pill *> &ptoOut)
 {
-    QObjectList pills = ui->foodVerticalLayout->parentWidget()->children();
+    QObjectList pills = ui->pillsVerticalLayout->parentWidget()->children();
     for (QObject *o : pills)
     {
         Pill *p = (Pill *) o->property("val").value<void *>();

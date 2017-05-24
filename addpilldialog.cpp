@@ -9,6 +9,23 @@ AddPillDialog::AddPillDialog(QWidget *parent) : QDialog(parent)
     this->amountLineEdit->clear();
     // remove question mark from the title bar
     this->setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint);
+    connect(this->pillNameLineEdit, SIGNAL(textChanged(QString)), this, SLOT(validate()));
+    connect(this->pillBreakfastCheckBox, SIGNAL(toggled(bool)), this, SLOT(validate()));
+    connect(this->pillDinnerCheckBox, SIGNAL(toggled(bool)), this, SLOT(validate()));
+    connect(this->pillLunchCheckBox, SIGNAL(toggled(bool)), this, SLOT(validate()));
+    connect(this->amountLineEdit, SIGNAL(textChanged(QString)), this, SLOT(validate()));
+    validate();
+}
+
+void AddPillDialog::validate()
+{
+    bool res = true;
+    res &= !(this->pillNameLineEdit->text().isEmpty());
+    res &= !(this->amountLineEdit->text().isEmpty());
+    res &= ((this->pillBreakfastCheckBox->isChecked()
+            + this->pillDinnerCheckBox->isChecked()
+            + this->pillLunchCheckBox->isChecked()) > 0);
+    this->OKPushButton->setEnabled(res);
 }
 
 void AddPillDialog::on_addPillDialog_accepted()
