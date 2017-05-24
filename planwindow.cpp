@@ -6,6 +6,7 @@ PlanWindow::PlanWindow(Plan *plan, QWidget *parent) :
     ui(new Ui::PlanWindow)
 {
     ui->setupUi(this);
+    setWindowTitle("Окно просмотра плана питания");
 
     connect(ui->closePlanAction, SIGNAL(triggered(bool)), this, SLOT(close()));
 
@@ -27,7 +28,7 @@ PlanWindow::PlanWindow(Plan *plan, QWidget *parent) :
     stringstream ss;
     plan->serialize(ss);
 
-    QString filename="Data.txt";
+    QString filename = PlanFilesManager::getNextFileNameAvailable();
     QFile file( filename );
     if ( file.open(QIODevice::ReadWrite) )
     {

@@ -10,7 +10,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->birthDateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(validate()));
     connect(ui->fioLineEdit, SIGNAL(textChanged(QString)), this, SLOT(validate()));
+    connect(ui->forbiddenLineEdit, SIGNAL(textChanged(QString)), this, SLOT(validate()));
 
+    setWindowTitle("Окно создания плана питания");
     ui->birthDateEdit->setDateRange(QDate(1940, 1, 1), QDate::currentDate().addMonths(-3));
     validate();
 
@@ -36,6 +38,25 @@ void MainWindow::validate()
     //TODO не используется
     if (ui->birthDateEdit->date() < QDate(1940, 1, 1)) {
         ui->statusBar->showMessage("Дата введена неверно.");
+        ui->createPlanPushButton->setEnabled(false);
+        return;
+    }
+
+    if (ui->forbiddenLineEdit->text().split(",").size() < 2) {
+        ui->statusBar->showMessage("Введите хотя бы 2 запрещённых продукта");
+        ui->createPlanPushButton->setEnabled(false);
+        return;
+    }
+
+    int fdSelected = 0;
+    for(QObject *o : ui->foodVerticalLayout->parentWidget()->children()) {
+         FoodCheckBox *fcb = (FoodCheckBox *) o;
+        if (fcb != nullptr) {
+            fdSelected += fcb->isChecked();
+        }
+    }
+    if (fdSelected < 2) {
+        ui->statusBar->showMessage("Выберите хотя бы 2 блюда для питания");
         ui->createPlanPushButton->setEnabled(false);
         return;
     }
@@ -187,7 +208,7 @@ void MainWindow::on_createPlanPushButton_clicked()
         Food *f = (Food *) o->property("val").value<void *>();
         if (f != nullptr)
         {
-            QCheckBox* cBox = (QCheckBox*) o;
+            FoodCheckBox * cBox = (FoodCheckBox*) o;
             if (cBox->checkState() == Qt::CheckState::Checked) {
                 foodVec.push_back(Food(*f));
             }
@@ -197,7 +218,7 @@ void MainWindow::on_createPlanPushButton_clicked()
     QObjectList pills = ui->pillsVerticalLayout->parentWidget()->children();
     for (QObject *o : pills)
     {
-        QCheckBox* cBox = (QCheckBox*) o;
+        PillCheckBox* cBox = (PillCheckBox *) o;
         Pill *p = (Pill *) o->property("val").value<void *>();
         if (p != nullptr)
         {
@@ -209,7 +230,9 @@ void MainWindow::on_createPlanPushButton_clicked()
 
     MedsProcess* meds = new MedsProcess(0);
     meds->setPills(pillVec);
-    meds->setRejectedFood({"Мука", "Перец", "Картошка"});
+    //vector<QString> fd = this->ui->forbiddenLineEdit->text().split(",").toVector().toStdVector();
+    //meds->setRejectedFood(fd);
+    meds->setRejectedFood({"Мука", "Яйца", "Картошка"});
     CookingProcess *cooking = new CookingProcess(2);
 
     //выпилить говно
@@ -373,6 +396,7 @@ void MainWindow::addFood(Food f)
     QCheckBox *ch = cbf->getCheckBox(f);
     connect(ch, SIGNAL(refreshDescription()), this, SLOT(refreshFoodDesc()));
     connect(ch, SIGNAL(clearDescription()), ui->foodPlainTextEdit, SLOT(clear()));
+    connect(ch, SIGNAL(toggled(bool)), this, SLOT(validate()));
     ui->foodVerticalLayout->addWidget(ch);
 }
 
@@ -381,6 +405,7 @@ void MainWindow::addPill(Pill p)
     QCheckBox *ch = cbf->getCheckBox(p);
     connect(ch, SIGNAL(refreshDescription()), this, SLOT(refreshPillDesc()));
     connect(ch, SIGNAL(clearDescription()), ui->pillPlainTextEdit, SLOT(clear()));
+    connect(ch, SIGNAL(toggled(bool)), this, SLOT(validate()));
     ui->pillsVerticalLayout->addWidget(ch);
 }
 

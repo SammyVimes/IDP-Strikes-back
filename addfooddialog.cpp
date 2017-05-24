@@ -3,6 +3,7 @@
 AddFoodDialog::AddFoodDialog(QWidget *parent) : QDialog(parent)
 {
     setupUi(this);
+    setWindowTitle("Добавить рецепт");
     this->nameLineEdit->clear();
     this->compLineEdit->clear();
     this->foodAmountSpinBox->setValue(1);

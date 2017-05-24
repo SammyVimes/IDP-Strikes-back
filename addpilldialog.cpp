@@ -3,6 +3,7 @@
 AddPillDialog::AddPillDialog(QWidget *parent) : QDialog(parent)
 {
     setupUi(this);
+    setWindowTitle("Добавить препарат");
     this->pillAfterRadioButton->setChecked(true);
     this->pillBeforeRadioButton->setChecked(false);
     this->pillNameLineEdit->clear();

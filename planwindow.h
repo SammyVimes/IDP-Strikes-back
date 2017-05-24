@@ -16,6 +16,7 @@
 #include "clickableellipseitem.h"
 #include <iostream>
 
+#include "planfilesmanager.h"
 #include "pill.h"
 #include "food.h"
 
