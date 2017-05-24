@@ -2,6 +2,7 @@
 #define PLANWINDOW_H
 
 #include <QMainWindow>
+#include <QCloseEvent>
 #include <QGraphicsView>
 #include <map>
 #include "displayabledfdelement.h"
@@ -33,6 +34,9 @@ public:
 
     ~PlanWindow();
     void drawDFD(bool rebuildMap);
+
+protected:
+    void closeEvent(QCloseEvent *e);
 
 private:
     Ui::PlanWindow *ui;

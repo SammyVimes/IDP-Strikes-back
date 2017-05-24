@@ -7,7 +7,6 @@ PlanWindow::PlanWindow(Plan *plan, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->closePlanAction, SIGNAL(triggered(bool)), parent, SLOT(raise()));
     connect(ui->closePlanAction, SIGNAL(triggered(bool)), this, SLOT(close()));
 
     connect(ui->helpAction, SIGNAL(triggered(bool)), parent, SLOT(showHelp()));
@@ -244,5 +243,14 @@ void PlanWindow::drawDFD(bool rebuildMap)
             scene->addPolygon(arrowHead, myPen, blackBrush);
         });
     });
+}
+
+void PlanWindow::closeEvent(QCloseEvent *e)
+{
+    parentWidget()->show();
+    parentWidget()->raise();
+    e->accept();
+//    connect(ui->closePlanAction, SIGNAL(triggered(bool)), parent, SLOT(show()));
+//    connect(ui->closePlanAction, SIGNAL(triggered(bool)), parent, SLOT(raise()));
 }
 

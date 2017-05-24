@@ -156,6 +156,7 @@ void MainWindow::on_createPlanPushButton_clicked()
     PlanWindow *pw = new PlanWindow(plan, this);
     pw->show();
     pw->raise();
+    this->hide();
 }
 
 void MainWindow::on_addPillPushButton_clicked()
