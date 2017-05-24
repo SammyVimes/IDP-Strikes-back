@@ -57,23 +57,23 @@ public:
     }
 
     void printStream(ostream& os) {
-        os << "<pill>" << endl;
-        os << "<name>" << endl;
-        os << m_name.toStdString() << endl;
-        os << "</name>" << endl;
-        os << "<lifeTime>" << endl;
-        os << QString::number(m_lifeTime).toStdString() << endl;
-        os << "</lifeTime>" << endl;
-        os << "<beforeFlag>" << endl;
-        os << QString::number(m_beforeFlag ? 1 : 0).toStdString() << endl;
-        os << "</beforeFlag>" << endl;
-        os << "<takeTimeMask>" << endl;
-        os << QString::number(m_takeTimeMask).toStdString() << endl;
-        os << "</takeTimeMask>" << endl;
-        os << "<amount>" << endl;
-        os << m_amount.toStdString() << endl;
-        os << "</amount>" << endl;
-        os << "</pill>" << endl;
+        os << "<pill>";
+        os << "<name>";
+        os << m_name.toStdString();
+        os << "</name>";
+        os << "<lifeTime>";
+        os << QString::number(m_lifeTime).toStdString();
+        os << "</lifeTime>";
+        os << "<beforeFlag>";
+        os << QString::number(m_beforeFlag ? 1 : 0).toStdString();
+        os << "</beforeFlag>";
+        os << "<takeTimeMask>";
+        os << QString::number(m_takeTimeMask).toStdString();
+        os << "</takeTimeMask>";
+        os << "<amount>";
+        os << m_amount.toStdString();
+        os << "</amount>";
+        os << "</pill>";
     }
 
 private:

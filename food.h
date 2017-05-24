@@ -59,18 +59,18 @@ public:
 
     void printStream(ostream& os) const {
         os << "<food>";
-        os << "<name>" << endl;
-        os << m_name.toStdString() << endl;
-        os << "</name>" << endl;
-        os << "<comp>" << endl;
-        os << comp().toStdString() << endl;
-        os << "</comp>" << endl;
-        os << "<expiration>" << endl;
-        os << QString::number(m_expirationDate).toStdString() << endl;
-        os << "</expiration>" << endl;
-        os << "<amount>" << endl;
-        os << QString::number(m_amount).toStdString() << endl;
-        os << "</amount>" << endl;
+        os << "<name>";
+        os << m_name.toStdString();
+        os << "</name>";
+        os << "<comp>";
+        os << comp().toStdString();
+        os << "</comp>";
+        os << "<expiration>";
+        os << QString::number(m_expirationDate).toStdString();
+        os << "</expiration>";
+        os << "<amount>";
+        os << QString::number(m_amount).toStdString();
+        os << "</amount>";
         os << "</food>";
     }
 

@@ -57,13 +57,13 @@ void Plan::setName(const QString &value)
 
 void Plan::serialize(ostream &os)
 {
-    os << "<plan>" << endl;
-    os << "<name>" << name.toStdString() << "</name>" << endl;
-    os << "<birthTimestamp>" << QString::number(birthTimestamp).toStdString() << "</birthTimestamp>" << endl;
-    os << "<days>" << QString::number(days).toStdString() << "</days>" << endl;
-    os << "<foodChangeThreshold>" << QString::number(foodChangeThreshold).toStdString() << "</foodChangeThreshold>" << endl;
+    os << "<plan>";
+    os << "<name>" << name.toStdString() << "</name>";
+    os << "<birthTimestamp>" << QString::number(birthTimestamp).toStdString() << "</birthTimestamp>";
+    os << "<days>" << QString::number(days).toStdString() << "</days>";
+    os << "<foodChangeThreshold>" << QString::number(foodChangeThreshold).toStdString() << "</foodChangeThreshold>";
     os << *this->graph;
-    os << "</plan>" << endl;
+    os << "</plan>";
 }
 
 // <graph>

@@ -11,11 +11,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->birthDateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(validate()));
     connect(ui->fioLineEdit, SIGNAL(textChanged(QString)), this, SLOT(validate()));
 
-    addPill(Pill("Бисептол", 10, true, 0b011, "2 таб"));
-    addPill(Pill("Бисептол2", 10, true, 0b011, "2 таб"));
-    addFood(Food("Макароны по-флотски", "макароны, фарш из свинины, лук", 3, 4));
-    addFood(Food("Макароны по-флотски2", "макароны, фарш из свинины, лук", 3, 4));
-
     ui->birthDateEdit->setDateRange(QDate(1940, 1, 1), QDate::currentDate().addMonths(-3));
     validate();
 
@@ -70,7 +65,7 @@ void MainWindow::closeEvent(QCloseEvent *e)
     }
 
     QList<Pill *> ptoOut;
-    QObjectList pills = ui->foodVerticalLayout->parentWidget()->children();
+    QObjectList pills = ui->pillsVerticalLayout->parentWidget()->children();
     for (QObject *o : pills)
     {
         Pill *p = (Pill *) o->property("val").value<void *>();
@@ -81,6 +76,44 @@ void MainWindow::closeEvent(QCloseEvent *e)
     }
 
     //TODO Serialize ftoOut and ptoOut
+
+    stringstream pillsStream;
+    stringstream foodStream;
+
+    pillsStream << "<pills>";
+    for (Pill* pill : ptoOut) {
+        pill->printStream(pillsStream);
+    }
+    pillsStream << "</pills>";
+
+    foodStream << "<food>";
+    for (Food* food : ftoOut) {
+        food->printStream(foodStream);
+    }
+    foodStream << "</food>";
+
+    QFile pillsFile("pills.mdp");
+    QFile foodFile("food.mdp");
+
+    if (pillsFile.open(QIODevice::ReadWrite)) {
+        QTextStream stream( &pillsFile );
+        stream.setCodec("UTF-8");
+        stream.setGenerateByteOrderMark(false);
+        stream << QString::fromStdString(pillsStream.str());
+        pillsFile.close();
+    } else {
+        errFlag = true;
+    }
+
+    if (foodFile.open(QIODevice::ReadWrite)) {
+        QTextStream stream( &foodFile );
+        stream.setCodec("UTF-8");
+        stream.setGenerateByteOrderMark(false);
+        stream << QString::fromStdString(foodStream.str());
+        foodFile.close();
+    } else {
+        errFlag = true;
+    }
 
     if (errFlag)
     {
@@ -198,11 +231,11 @@ void MainWindow::checkXMLPresent()
 {
     //TODO Get pills and food from pills.xml and food.xml
     //TODO Use addPill() and addFood() to add objects
-    QFile pfile("pills.xml");
+    QFile pfile("pills.mdp");
     QFileInfo fi(pfile);
     if (!pfile.open(QIODevice::ReadOnly))
     {
-        QMessageBox::warning(this, "Не могу открыть pills.xml", "Ошибка при открытии " + fi.absoluteFilePath());
+        QMessageBox::warning(this, "Не могу открыть pills.mdp", "Ошибка при открытии " + fi.absoluteFilePath());
     }
     else
     {
@@ -210,7 +243,7 @@ void MainWindow::checkXMLPresent()
         if (!doc.setContent(&pfile))
         {
             pfile.close();
-            QMessageBox::warning(this, "Не могу открыть pills.xml", "Ошибка при открытии " + fi.absoluteFilePath());
+            QMessageBox::warning(this, "Не могу открыть pills.mdp", "Ошибка при открытии " + fi.absoluteFilePath());
         }
         else
         {
@@ -218,25 +251,25 @@ void MainWindow::checkXMLPresent()
             QDomNode n = docElem.firstChild();
             while(!n.isNull())
             {
-                Pill::deserialize(n);
+                addPill(Pill::deserialize(n));
                 n = n.nextSibling();
             }
             pfile.close();
         }
     }
 
-    QFile ffile("food.xml");
+    QFile ffile("food.mdp");
     QFileInfo ffi(ffile);
     if (!ffile.open(QIODevice::ReadOnly))
     {
-        QMessageBox::warning(this, "Не могу открыть food.xml", "Ошибка при открытии " + ffi.absoluteFilePath());
+        QMessageBox::warning(this, "Не могу открыть food.mdp", "Ошибка при открытии " + ffi.absoluteFilePath());
     }
     else
     {
         QDomDocument doc("food");
         if (!doc.setContent(&ffile)) {
             ffile.close();
-            QMessageBox::warning(this, "Не могу открыть food.xml", "Ошибка при открытии " + ffi.absoluteFilePath());
+            QMessageBox::warning(this, "Не могу открыть food.mdp", "Ошибка при открытии " + ffi.absoluteFilePath());
             return;
         }
         ffile.close();
@@ -245,7 +278,7 @@ void MainWindow::checkXMLPresent()
         QDomNode n = docElem.firstChild();
         while(!n.isNull())
         {
-            Food::deserialize(n);
+            addFood(Food::deserialize(n));
             n = n.nextSibling();
         }
         ffile.close();
