@@ -12,11 +12,11 @@ class EatingProcess : public DFDElement
 {
 public:
 
-    EatingProcess(int type):DFDElement(type) {
+    EatingProcess(int type):DFDElement(2) {
 
     }
 
-    EatingProcess():DFDElement() {
+    EatingProcess():DFDElement(2) {
 
     }
 

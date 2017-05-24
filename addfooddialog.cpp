@@ -7,6 +7,8 @@ AddFoodDialog::AddFoodDialog(QWidget *parent) : QDialog(parent)
     this->compLineEdit->clear();
     this->foodAmountSpinBox->setValue(1);
     this->foodLifetimeSpinBox->setValue(1);
+    // remove question mark from the title bar
+    this->setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint);
 }
 
 void AddFoodDialog::on_addFoodDialog_accepted()

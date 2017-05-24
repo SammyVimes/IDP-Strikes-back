@@ -57,13 +57,13 @@ void Plan::setName(const QString &value)
 
 void Plan::serialize(ostream &os)
 {
-    os << "<plan>" << endl;
-    os << "<name>" << name.toStdString() << "</name>" << endl;
-    os << "<birthTimestamp>" << QString::number(birthTimestamp).toStdString() << "</birthTimestamp>" << endl;
-    os << "<days>" << QString::number(days).toStdString() << "</days>" << endl;
-    os << "<foodChangeThreshold>" << QString::number(foodChangeThreshold).toStdString() << "</foodChangeThreshold>" << endl;
+    os << "<plan>";
+    os << "<name>" << name.toStdString() << "</name>";
+    os << "<birthTimestamp>" << QString::number(birthTimestamp).toStdString() << "</birthTimestamp>";
+    os << "<days>" << QString::number(days).toStdString() << "</days>";
+    os << "<foodChangeThreshold>" << QString::number(foodChangeThreshold).toStdString() << "</foodChangeThreshold>";
     os << *this->graph;
-    os << "</plan>" << endl;
+    os << "</plan>";
 }
 
 // <graph>
@@ -180,5 +180,25 @@ Plan* Plan::deserialize(istream &is)
         }
     }
     return plan;
+}
+
+EatingProcess *Plan::getEating() const
+{
+    return eating;
+}
+
+void Plan::setEating(EatingProcess *value)
+{
+    eating = value;
+}
+
+MedsProcess *Plan::getMeds() const
+{
+    return meds;
+}
+
+void Plan::setMeds(MedsProcess *value)
+{
+    meds = value;
 }
 

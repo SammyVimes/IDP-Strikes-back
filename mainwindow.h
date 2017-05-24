@@ -47,9 +47,9 @@ private slots:
     void addPill(Pill p);
 private:
     Ui::MainWindow *ui;
-    AddPillDialog *apd = NULL;
-    AddFoodDialog *afd = NULL;
-    CheckBoxFabric *cbf = NULL;
+    AddPillDialog *apd = nullptr;
+    AddFoodDialog *afd = nullptr;
+    CheckBoxFabric *cbf = nullptr;
     void checkXMLPresent();
 };
 
