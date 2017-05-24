@@ -7,6 +7,8 @@ AddPillDialog::AddPillDialog(QWidget *parent) : QDialog(parent)
     this->pillBeforeRadioButton->setChecked(false);
     this->pillNameLineEdit->clear();
     this->amountLineEdit->clear();
+    // remove question mark from the title bar
+    this->setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint);
 }
 
 void AddPillDialog::on_addPillDialog_accepted()
