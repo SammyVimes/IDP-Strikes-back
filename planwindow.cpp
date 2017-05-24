@@ -274,17 +274,24 @@ void PlanWindow::drawDFD(bool rebuildMap)
             qreal arrowSize = 20;
             QPointF pos1 =  QPointF(node1->x() + (elemSize / 2), node1->y() + (elemSize / 2));
             QPointF pos2 =  QPointF(node2->x() + (elemSize / 2), node2->y() + (elemSize / 2));
-
-            QGraphicsLineItem* gLine = scene->addLine(pos1.x(), pos1.y(), pos2.x(), pos2.y(), myPen);
-
-            double Pi = 3.1415926;
-
-            QBrush blackBrush(Qt::black);
             QLineF line(pos2, pos1);
             double angle = ::acos(line.dx() / line.length());
+            double Pi = 3.1415926;
             if (line.dy() >= 0) {
                 angle = (Pi * 2) - angle;
             }
+
+            float ofX = (elemSize / 2) * ::cos(angle);
+            float ofY = (elemSize / 2) * ::sin(angle);
+            pos2 = QPointF(pos2.x() + ofX, pos2.y() - ofY);
+            line = QLineF(pos2, pos1);
+
+
+            QGraphicsLineItem* gLine = scene->addLine(pos1.x(), pos1.y(), pos2.x(), pos2.y(), myPen);
+
+
+            QBrush blackBrush(Qt::black);
+
             QPointF arrowP1 = line.p1() + QPointF(sin(angle + Pi / 3) * arrowSize,
                                                   cos(angle + Pi / 3) * arrowSize);
             QPointF arrowP2 = line.p1() + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
