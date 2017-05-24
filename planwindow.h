@@ -34,7 +34,8 @@ public:
 
     ~PlanWindow();
     void drawDFD(bool rebuildMap);
-
+    void showInfo(EatingProcess* ep);
+    void clearInfo();
 protected:
     void closeEvent(QCloseEvent *e);
 

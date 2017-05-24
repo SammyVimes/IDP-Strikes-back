@@ -85,13 +85,63 @@ public:
         }
         if (lastSelected == item) {
             lastSelected = nullptr;
+            window->clearInfo();
         } else {
             lastSelected = item;
+            window->showInfo((EatingProcess*) item->getElement());
         }
         window->drawDFD(false);
+
     }
 };
 
+QString foodDesc(Food food) {
+    QString desc = "Название: " + food.name() +
+            "\nСостав: " + food.comp() +
+            "\nСрок  годности: " + QString::number(food.expirationDate()) + " дней" +
+            "\nКоличество: " + QString::number(food.amount()) + " порции";
+    return desc;
+}
+
+QString pillDesc(Pill pill) {
+    QString time = (pill.beforeFlag()) ? "перед" : "после";
+    QString times = "";
+    times += (pill.takeTimeMask() & 0b100 != 0) ? " завтрак" : "";
+    times += (pill.takeTimeMask() & 0b010 != 0) ? " обед" : "";
+    times += (pill.takeTimeMask() & 0b001 != 0) ? " ужин" : "";
+    QString desc = "Название: " + pill.name() +
+            "\nУпотреблять: " + time + times +
+            "\nВ течении: " + QString::number(pill.getLifeTime()) + " дней";
+    return desc;
+}
+
+void PlanWindow::showInfo(EatingProcess *ep)
+{
+    Food food = ep->getFood();
+    vector<Pill> medsAfterEating = ep->getMedsAfterEating();
+    vector<Pill> medsBeforeEating = ep->getMedsBeforeEating();
+
+    ui->foodDesc->setText(foodDesc(food));
+
+    QString before = "";
+    for (Pill pill : medsBeforeEating) {
+        before.append(pillDesc(pill)).append("\n");
+    }
+    ui->pillBeforeDesc->setText(before);
+
+    QString after = "";
+    for (Pill pill : medsAfterEating) {
+        after.append(pillDesc(pill)).append("\n");
+    }
+    ui->pillAfterDesc->setText(after);
+}
+
+void PlanWindow::clearInfo()
+{
+    ui->foodDesc->clear();
+    ui->pillAfterDesc->clear();
+    ui->pillBeforeDesc->clear();
+}
 
 void PlanWindow::drawDFD(bool rebuildMap)
 {
@@ -141,7 +191,8 @@ void PlanWindow::drawDFD(bool rebuildMap)
         }
         case 1: {
             QGraphicsItem* item = scene->addRect(0, 0, 300, 80);
-            item->setPos(offsetLeft + 0, 300);
+            int rows = (graph->getNodes().size() - 2) / 3;
+            item->setPos(offsetLeft + 0, (colOffset * rows) + padding);
 
             DisplayableDFDElement* displayable;
             if (rebuildMap) {
@@ -244,6 +295,7 @@ void PlanWindow::drawDFD(bool rebuildMap)
         });
     });
 }
+
 
 void PlanWindow::closeEvent(QCloseEvent *e)
 {
