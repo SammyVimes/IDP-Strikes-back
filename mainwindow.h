@@ -25,6 +25,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void getPillList(QList<Pill *> &ptoOut);
+    
+    void getFoodList(QList<Food *> &ftoOut);
+    
 public slots:
     void validate();
     void showHelp();

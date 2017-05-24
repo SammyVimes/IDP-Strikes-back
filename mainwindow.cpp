@@ -55,21 +55,8 @@ void MainWindow::showHelp()
     QMessageBox::about(this, "Помощь", "Оно должно работать!");
 }
 
-void MainWindow::closeEvent(QCloseEvent *e)
+void MainWindow::getPillList(QList<Pill *> &ptoOut)
 {
-    bool errFlag = false;
-    QList<Food *> ftoOut;
-    QObjectList food = ui->foodVerticalLayout->parentWidget()->children();
-    for (QObject *o : food)
-    {
-        Food *f = (Food *) o->property("val").value<void *>();
-        if (f != NULL)
-        {
-            ftoOut.append(f);
-        }
-    }
-
-    QList<Pill *> ptoOut;
     QObjectList pills = ui->foodVerticalLayout->parentWidget()->children();
     for (QObject *o : pills)
     {
@@ -79,6 +66,29 @@ void MainWindow::closeEvent(QCloseEvent *e)
             ptoOut.append(p);
         }
     }
+}
+
+void MainWindow::getFoodList(QList<Food *> &ftoOut)
+{
+    QObjectList food = ui->foodVerticalLayout->parentWidget()->children();
+    for (QObject *o : food)
+    {
+        Food *f = (Food *) o->property("val").value<void *>();
+        if (f != NULL)
+        {
+            ftoOut.append(f);
+        }
+    }
+}
+
+void MainWindow::closeEvent(QCloseEvent *e)
+{
+    bool errFlag = false;
+    QList<Food *> ftoOut;
+    getFoodList(ftoOut);
+
+    QList<Pill *> ptoOut;
+    getPillList(ptoOut);
 
     //TODO Serialize ftoOut and ptoOut
 
