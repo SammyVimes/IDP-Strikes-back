@@ -14,6 +14,7 @@ public:
 signals:
     void readyToAddFood(Food f);
 public slots:
+    void validate();
 private slots:
     void on_addFoodDialog_accepted();
 };

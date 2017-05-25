@@ -1,97 +1,67 @@
 #include "planwindow.h"
 #include "ui_planwindow.h"
 
-PlanWindow::PlanWindow(QWidget *parent) :
+PlanWindow::PlanWindow(Plan *plan, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::PlanWindow)
 {
     ui->setupUi(this);
+    setWindowTitle("Окно просмотра плана питания");
+
+    connect(ui->closePlanAction, SIGNAL(triggered(bool)), parent, SLOT(raise()));
+    connect(ui->closePlanAction, SIGNAL(triggered(bool)), parent, SLOT(show()));
+    connect(ui->closePlanAction, SIGNAL(triggered(bool)), this, SLOT(close()));
+
+    connect(ui->helpAction, SIGNAL(triggered(bool)), parent, SLOT(showHelp()));
+
+    connect(ui->exitAction, SIGNAL(triggered(bool)), this, SLOT(close()));
+    connect(ui->exitAction, SIGNAL(triggered(bool)), parent, SLOT(close()));
 
     QGraphicsScene* scene = new QGraphicsScene(this);
     this->ui->graphicsView->setScene(scene);
 
-    DirectedGraph<int>* graph = new DirectedGraph<int>;
-    graph->addNode(50);
-    using MNode = DirectedGraph<int>::Node;
-    MNode* node1FromGraph1 = graph->getNodes()[0];
-    graph->addNode(node1FromGraph1, 1337);
-
-    DirectedGraph<int>* graph2 = new DirectedGraph<int>;
-    graph2->addNode(228);
-    MNode* node1FromGraph2 = graph2->getNodes()[0];
-    graph2->addNode(node1FromGraph2, 1588);
-
-    try {
-        graph->addNode(node1FromGraph2, 337);
-        exit(0);
-    } catch (BadGraphException& e) {
-
-    }
-    try {
-        graph->linkNodes(node1FromGraph1, node1FromGraph2);
-        exit(0);
-    } catch (BadGraphException& e) {
-
-    }
-
-    delete graph;
-    delete graph2;
-
-    testGraph();
-}
-
-void PlanWindow::testGraph() {
-    Pill nimesil(QString("Нимесил"), 5, true, 1, QString::number(5));
-    Pill asspirine(QString("Assпирин"), 5, true, 1, QString::number(5));
-    Food pizz(QString("Пепперони"), QString("Pickle x1, Box x1"), 15, 1);
+    this->plan = plan;
 
 
-    using DNode = DirectedGraph<DFDElement*>::Node;
-    DirectedGraph<DFDElement*>* dfd = new DirectedGraph<DFDElement*>;
-    DNode* cooking = dfd->addNode(new DFDElement(0));
-    DNode* doctor = dfd->addNode(new DFDElement(1));
-    CookingProcess *p = new CookingProcess(2);
-    std::vector<Food> vec;
-    vec.push_back(pizz);
-    p->setMenu(vec);
-
-    EatingProcess* p2 = new EatingProcess(2);
-    p2->setFood(pizz);
-    vector<Pill> before = {asspirine};
-    vector<Pill> after = {nimesil};
-    p2->setMedsAfterEating(after);
-    p2->setMedsBeforeEating(before);
-
-    DNode* n11 = dfd->addNode(cooking, p);
-    DNode* n12 = dfd->addNode(cooking, new DFDElement(2));
-    DNode* n13 = dfd->addNode(n11, new DFDElement(2));
-    DNode* n21 = dfd->addNode(n13, new DFDElement(2));
-    DNode* n22 = dfd->addNode(n12, p2);
-    DNode* n23 = dfd->addNode(doctor, new DFDElement(2));
-    DNode* n31 = dfd->addNode(n23, new DFDElement(2));
-    DNode* n32 = dfd->addNode(n31, new DFDElement(2));
-    DNode* n33 = dfd->addNode(n32, new DFDElement(2));
-    dfd->linkNodes(doctor, n11);
-    dfd->linkNodes(doctor, n13);
-    dfd->linkNodes(doctor, n21);
-    dfd->linkNodes(doctor, n31);
-    dfd->linkNodes(n22, n32);
-    dfd->linkNodes(doctor, n33);
-
-    this->graph = dfd;
+    // отрисуем
     drawDFD(true);
-    stringstream ss;
-    ss << *this->graph;
 
-    QString filename="Data.txt";
+    // сериализуем
+    stringstream ss;
+    plan->serialize(ss);
+
+    QString filename = "plan_" + plan->getName() + ".mdp";
+    //QString filename = PlanFilesManager::getNextFileNameAvailable();
     QFile file( filename );
     if ( file.open(QIODevice::ReadWrite) )
     {
         QTextStream stream( &file );
         stream << QString::fromStdString(ss.str());
+        file.close();
     }
-    QTextStream ts( stdout );
-    ts << QString::fromStdString(ss.str());
+
+    // десериализуем
+    if ( file.open(QIODevice::ReadOnly) )
+    {
+        QTextStream stream( &file );
+        string s = stream.readAll().toStdString();
+        stringstream ss;
+        ss << s;
+        Plan* deserialized = Plan::deserialize(ss);
+        file.close();
+
+        // сериализуем снова, чтобы найти отличия
+        QString newFileName="DataDeserialized.txt";
+        QFile newFile( newFileName );
+        if ( newFile.open(QIODevice::ReadWrite) )
+        {
+            QTextStream nStream( &newFile );
+            stringstream nSS;
+            deserialized->serialize(nSS);
+            nStream << QString::fromStdString(nSS.str());
+            newFile.close();
+        }
+    }
 }
 
 PlanWindow::~PlanWindow()
@@ -119,13 +89,63 @@ public:
         }
         if (lastSelected == item) {
             lastSelected = nullptr;
+            window->clearInfo();
         } else {
             lastSelected = item;
+            window->showInfo((EatingProcess*) item->getElement());
         }
         window->drawDFD(false);
+
     }
 };
 
+QString foodDesc(Food food) {
+    QString desc = "Название: " + food.name() +
+            "\nСостав: " + food.comp() +
+            "\nСрок  годности: " + QString::number(food.expirationDate()) + " дней" +
+            "\nКоличество: " + QString::number(food.amount()) + " порции";
+    return desc;
+}
+
+QString pillDesc(Pill pill) {
+    QString time = (pill.beforeFlag()) ? "перед" : "после";
+    QString times = "";
+    times += (pill.takeTimeMask() & 0b100 != 0) ? " завтрак" : "";
+    times += (pill.takeTimeMask() & 0b010 != 0) ? " обед" : "";
+    times += (pill.takeTimeMask() & 0b001 != 0) ? " ужин" : "";
+    QString desc = "Название: " + pill.name() +
+            "\nУпотреблять: " + time + times +
+            "\nВ течении: " + QString::number(pill.getLifeTime()) + " дней";
+    return desc;
+}
+
+void PlanWindow::showInfo(EatingProcess *ep)
+{
+    Food food = ep->getFood();
+    vector<Pill> medsAfterEating = ep->getMedsAfterEating();
+    vector<Pill> medsBeforeEating = ep->getMedsBeforeEating();
+
+    ui->foodDesc->setText(foodDesc(food));
+
+    QString before = "";
+    for (Pill pill : medsBeforeEating) {
+        before.append(pillDesc(pill)).append("\n");
+    }
+    ui->pillBeforeDesc->setText(before);
+
+    QString after = "";
+    for (Pill pill : medsAfterEating) {
+        after.append(pillDesc(pill)).append("\n");
+    }
+    ui->pillAfterDesc->setText(after);
+}
+
+void PlanWindow::clearInfo()
+{
+    ui->foodDesc->clear();
+    ui->pillAfterDesc->clear();
+    ui->pillBeforeDesc->clear();
+}
 
 void PlanWindow::drawDFD(bool rebuildMap)
 {
@@ -151,7 +171,7 @@ void PlanWindow::drawDFD(bool rebuildMap)
     QDate curDate = QDate::currentDate();
     int curDay = 1;
 
-    DirectedGraph<DFDElement*>* graph = this->graph;
+    DirectedGraph<DFDElement*>* graph = this->plan->getGraph();
     std::for_each(graph->begin(), graph->end(), [this, rebuildMap, &curDate, &curDay, offsetLeft, padding, elemSize, colOffset, &row, &col, graph, scene](DNode* n) {
         int type = n->getValue()->getType();
 
@@ -175,7 +195,8 @@ void PlanWindow::drawDFD(bool rebuildMap)
         }
         case 1: {
             QGraphicsItem* item = scene->addRect(0, 0, 300, 80);
-            item->setPos(offsetLeft + 0, 300);
+            int rows = (graph->getNodes().size() - 2) / 3;
+            item->setPos(offsetLeft + 0, (colOffset * rows) + padding);
 
             DisplayableDFDElement* displayable;
             if (rebuildMap) {
@@ -257,17 +278,24 @@ void PlanWindow::drawDFD(bool rebuildMap)
             qreal arrowSize = 20;
             QPointF pos1 =  QPointF(node1->x() + (elemSize / 2), node1->y() + (elemSize / 2));
             QPointF pos2 =  QPointF(node2->x() + (elemSize / 2), node2->y() + (elemSize / 2));
-
-            QGraphicsLineItem* gLine = scene->addLine(pos1.x(), pos1.y(), pos2.x(), pos2.y(), myPen);
-
-            double Pi = 3.1415926;
-
-            QBrush blackBrush(Qt::black);
             QLineF line(pos2, pos1);
             double angle = ::acos(line.dx() / line.length());
+            double Pi = 3.1415926;
             if (line.dy() >= 0) {
                 angle = (Pi * 2) - angle;
             }
+
+            float ofX = (elemSize / 2) * ::cos(angle);
+            float ofY = (elemSize / 2) * ::sin(angle);
+            pos2 = QPointF(pos2.x() + ofX, pos2.y() - ofY);
+            line = QLineF(pos2, pos1);
+
+
+            QGraphicsLineItem* gLine = scene->addLine(pos1.x(), pos1.y(), pos2.x(), pos2.y(), myPen);
+
+
+            QBrush blackBrush(Qt::black);
+
             QPointF arrowP1 = line.p1() + QPointF(sin(angle + Pi / 3) * arrowSize,
                                                   cos(angle + Pi / 3) * arrowSize);
             QPointF arrowP2 = line.p1() + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
@@ -277,5 +305,15 @@ void PlanWindow::drawDFD(bool rebuildMap)
             scene->addPolygon(arrowHead, myPen, blackBrush);
         });
     });
+}
+
+
+void PlanWindow::closeEvent(QCloseEvent *e)
+{
+    parentWidget()->show();
+    parentWidget()->raise();
+    e->accept();
+//    connect(ui->closePlanAction, SIGNAL(triggered(bool)), parent, SLOT(show()));
+//    connect(ui->closePlanAction, SIGNAL(triggered(bool)), parent, SLOT(raise()));
 }
 

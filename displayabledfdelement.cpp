@@ -5,5 +5,5 @@ DisplayableDFDElement::DisplayableDFDElement(int id, int row, int col, DFDElemen
     this->col = col;
     this->row = row;
     this->id = id;
-    this->element = element;
+    this->element = dfdElement;
 }

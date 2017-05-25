@@ -30,6 +30,27 @@ void EatingProcess::setMedsAfterEating(const vector<Pill> &value)
     medsAfterEating = value;
 }
 
+DFDElement *EatingProcess::deserialize(QDomNode node)
+{
+    QDomNode eatElem = node.firstChild();
+    EatingProcess* eatingProcess = new EatingProcess();
+    while (!eatElem.isNull()) {
+        QString nodeName = eatElem.nodeName();
+        if (nodeName == "before") {
+            auto pills = deserializePills(eatElem);
+            eatingProcess->setMedsBeforeEating(pills);
+        } else if (nodeName == "after") {
+            auto pills = deserializePills(eatElem);
+            eatingProcess->setMedsAfterEating(pills);
+        } else if (nodeName == "food") {
+            auto food = Food::deserialize(eatElem);
+            eatingProcess->setFood(food);
+        }
+        eatElem = eatElem.nextSibling();
+    }
+    return eatingProcess;
+}
+
 
 void EatingProcess::printToStream(ostream &os) const
 {

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <QStringList>
+#include <QtXml>
 
 using namespace std;
 
@@ -34,20 +35,42 @@ public:
     int amount() const;
     void setAmount(int amount);
 
+    static Food deserialize(QDomNode node) {
+        QDomNode fElem = node.firstChild();
+        QString name;
+        QString comp;
+        int expirationDate;
+        int amount;
+        while (!fElem.isNull()) {
+            QString tagName = fElem.nodeName();
+            if (tagName == "name") {
+               name = fElem.firstChild().nodeValue();
+            } else if (tagName == "comp") {
+                comp = fElem.firstChild().nodeValue();
+            } else if (tagName == "expiration") {
+                expirationDate = fElem.firstChild().nodeValue().toInt();
+            } else if (tagName == "amount") {
+                amount = fElem.firstChild().nodeValue().toInt();
+            }
+            fElem = fElem.nextSibling();
+        }
+        return Food(name, comp, expirationDate, amount);
+    }
+
     void printStream(ostream& os) const {
         os << "<food>";
-        os << "<name>" << endl;
-        os << m_name.toStdString() << endl;
-        os << "</name>" << endl;
-        os << "<comp>" << endl;
-        os << comp().toStdString() << endl;
-        os << "</comp>" << endl;
-        os << "<expiration>" << endl;
-        os << QString::number(m_expirationDate).toStdString() << endl;
-        os << "</expiration>" << endl;
-        os << "<amount>" << endl;
-        os << QString::number(m_amount).toStdString() << endl;
-        os << "</amount>" << endl;
+        os << "<name>";
+        os << m_name.toStdString();
+        os << "</name>";
+        os << "<comp>";
+        os << comp().toStdString();
+        os << "</comp>";
+        os << "<expiration>";
+        os << QString::number(m_expirationDate).toStdString();
+        os << "</expiration>";
+        os << "<amount>";
+        os << QString::number(m_amount).toStdString();
+        os << "</amount>";
         os << "</food>";
     }
 

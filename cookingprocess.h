@@ -12,16 +12,18 @@ class CookingProcess : public DFDElement
 {
 public:
 
-    CookingProcess(int type):DFDElement(type) {
+    CookingProcess(int type):DFDElement(0) {
 
     }
 
-    CookingProcess():DFDElement() {
+    CookingProcess():DFDElement(0) {
 
     }
 
     vector<Food> getMenu() const;
     void setMenu(const vector<Food> &value);
+
+    static DFDElement* deserialize (QDomNode node);
 
 private:
     vector<Food> menu;

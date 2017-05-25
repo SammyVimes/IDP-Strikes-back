@@ -15,6 +15,7 @@ signals:
     void readyToAddPill(Pill p);
 
 public slots:
+    void validate();
 private slots:
     void on_addPillDialog_accepted();
 };

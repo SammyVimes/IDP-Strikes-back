@@ -51,6 +51,7 @@ class AllocatorException: public Exception
  };
 
 
+namespace MDP {
 template <class V>
 class DirectedGraph
 {
@@ -111,6 +112,10 @@ public:
 
         inline int getId() {
             return this->nodeId;
+        }
+
+        inline int setId(int value) {
+            this->nodeId = value;
         }
 
         DirectedGraph* getGraph() {
@@ -358,7 +363,7 @@ std::ostream& operator<< (std::ostream& os, const DirectedGraph<V2>& dt) {
     typedef typename DirectedGraph<V2>::Node NODE;
     size_t edgesCounter = 0;
 
-    os << "<plan>" << endl;
+    os << "<graph>" << endl;
 
     os << "<nodes>" << endl;
 
@@ -379,7 +384,7 @@ std::ostream& operator<< (std::ostream& os, const DirectedGraph<V2>& dt) {
     });
     os << "</outgoing>" << endl;
 
-    os << "</plan>" << endl;
+    os << "</graph>" << endl;
 
     return os;
 }
@@ -387,6 +392,7 @@ std::ostream& operator<< (std::ostream& os, const DirectedGraph<V2>& dt) {
 template <typename V2>
 std::istream& operator>> (std::istream& is, DirectedGraph<V2>& dt) {
 
+}
 }
 
 #endif // DIRECTEDGRAPH_H
