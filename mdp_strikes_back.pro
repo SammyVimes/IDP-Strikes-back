@@ -31,7 +31,9 @@ SOURCES += main.cpp\
     pillcheckbox.cpp \
     checkboxfabric.cpp \
     foodcheckbox.cpp \
-    plan.cpp
+    plan.cpp \
+    startdialog.cpp \
+    planfilesmanager.cpp
 
 HEADERS  += mainwindow.h \
     directedgraph.h \
@@ -50,9 +52,12 @@ HEADERS  += mainwindow.h \
     pillcheckbox.h \
     checkboxfabric.h \
     foodcheckbox.h \
-    plan.h
+    plan.h \
+    startdialog.h \
+    planfilesmanager.h
 
 FORMS    += mainwindow.ui \
     planwindow.ui \
     addpilldialog.ui \
-    addfooddialog.ui
+    addfooddialog.ui \
+    startdialog.ui
