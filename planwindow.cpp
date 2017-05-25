@@ -8,6 +8,8 @@ PlanWindow::PlanWindow(Plan *plan, QWidget *parent) :
     ui->setupUi(this);
     setWindowTitle("Окно просмотра плана питания");
 
+    connect(ui->closePlanAction, SIGNAL(triggered(bool)), parent, SLOT(raise()));
+    connect(ui->closePlanAction, SIGNAL(triggered(bool)), parent, SLOT(show()));
     connect(ui->closePlanAction, SIGNAL(triggered(bool)), this, SLOT(close()));
 
     connect(ui->helpAction, SIGNAL(triggered(bool)), parent, SLOT(showHelp()));
