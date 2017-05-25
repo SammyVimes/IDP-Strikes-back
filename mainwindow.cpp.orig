@@ -1,0 +1,184 @@
+﻿#include "mainwindow.h"
+#include "ui_mainwindow.h"
+
+MainWindow::MainWindow(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+void MainWindow::on_createPlanPushButton_clicked()
+{
+<<<<<<< HEAD
+    QGraphicsView* gView = this->ui->graphicsView;
+    QGraphicsScene* scene = gView->scene();
+    scene->clear();
+
+    if (rebuildMap) {
+        elMap.clear();
+    }
+
+    using DNode = DirectedGraph<DFDElement>::Node;
+
+    int row = 0;
+    int col = 0;
+
+    int offsetLeft = 100;
+    int padding = 25;
+    int elemSize = 50;
+
+    int colOffset = elemSize + (padding * 2);
+
+    QDate curDate = QDate::currentDate();
+    int curDay = 1;
+
+    DirectedGraph<DFDElement>* graph = this->graph;
+    std::for_each(graph->begin(), graph->end(), [this, rebuildMap, &curDate, &curDay, offsetLeft, padding, elemSize, colOffset, &row, &col, graph, scene](DNode* n) {
+        int type = n->getValue().getType();
+
+        QBrush greenBrush(Qt::green);
+        QPen outlinePen(Qt::black);
+        outlinePen.setWidth(2);
+
+        switch (type) {
+        case 0: {
+            QGraphicsItem* item = scene->addRect(0, 0, 80, 300);
+            item->setPos(0, 0);
+            DisplayableDFDElement* displayable;
+            if (rebuildMap) {
+                displayable = new DisplayableDFDElement(n->getId(), -1, -1, n->getValue());
+                this->elMap[n->getId()] = displayable;
+            } else {
+                displayable = this->elMap[n->getId()];
+            }
+            displayable->setItem(item);
+            break;
+        }
+        case 1: {
+            QGraphicsItem* item = scene->addRect(0, 0, 300, 80);
+            item->setPos(offsetLeft + 0, 300);
+
+            DisplayableDFDElement* displayable;
+            if (rebuildMap) {
+                displayable = new DisplayableDFDElement(n->getId(), -1, -1, n->getValue());
+                this->elMap[n->getId()] = displayable;
+            } else {
+                displayable = this->elMap[n->getId()];
+            }
+            displayable->setItem(item);
+            break;
+        }
+        case 2: {
+            qreal x = colOffset * col + padding + offsetLeft;
+            qreal y = colOffset * row + padding;
+            ClickableEllipseItem* item = new ClickableEllipseItem();
+            item->setRect(0, 0, elemSize, elemSize);
+            item->setPos(x, y);
+            item->setPen(outlinePen);
+            item->setBrush(greenBrush);
+            scene->addItem(item);
+            DisplayableDFDElement* displayable;
+            if (rebuildMap) {
+                displayable = new DisplayableDFDElement(n->getId(), row, col, n->getValue());
+                this->elMap[n->getId()] = displayable;
+            } else {
+                displayable = this->elMap[n->getId()];
+            }
+            displayable->setItem(item);
+            item->listener = new IntakeClickListener(this, displayable);
+
+            col++;
+            if (col > 2) {
+                qreal x = colOffset * col + padding + offsetLeft;
+                qreal y = colOffset * row + padding;
+                scene->addRect(x, y, elemSize * 2, elemSize);
+                QGraphicsTextItem* text = scene->addText(QString("День ")
+                                                         + QString::number(curDay)
+                                                         + QString("\n")
+                                                         + curDate.toString("dd MMMM"));
+                text->setTextWidth(elemSize * 2);
+                text->setPos(x, y);
+
+                row++;
+                col = 0;
+                curDate = curDate.addDays(1);
+                curDay++;
+            }
+            break;
+        }
+        }
+    });
+
+    std::for_each(graph->begin(), graph->end(), [this, offsetLeft, padding, elemSize, colOffset, graph, scene](DNode* n) {
+        int id = n->getId();
+        std::vector<DNode*> outgoingNodes = n->getOutgoingNodes();
+        DisplayableDFDElement* selfNode = elMap[id];
+
+        QGraphicsItem* node1 = selfNode->getItem();
+
+        if (!node1) {
+            return;
+        }
+
+        std::for_each(outgoingNodes.begin(), outgoingNodes.end(), [this, &selfNode, elemSize, scene, node1](DNode* outN) {
+            DisplayableDFDElement* el = this->elMap[outN->getId()];
+            QGraphicsItem* node2 = el->getItem();
+
+            if (!node2) {
+                return;
+            }
+
+            if (!selfNode->isSelected() && !el->isSelected()) {
+                return;
+            }
+
+            QPen myPen;
+            myPen.setWidth(2);
+            myPen.setColor(QColor(100, 100, 100));
+            qreal arrowSize = 20;
+            QPointF pos1 =  QPointF(node1->x() + (elemSize / 2), node1->y() + (elemSize / 2));
+            QPointF pos2 =  QPointF(node2->x() + (elemSize / 2), node2->y() + (elemSize / 2));
+
+            QBrush blackBrush(Qt::black);
+            QLineF line(pos2, pos1);
+
+            double Pi = 3.1415926;
+            qreal degAngle = line.angle();
+
+            qreal lAngle = degAngle * (Pi / 180);
+            qreal cosX = cos(lAngle);
+            qreal sinX = sin(lAngle);
+
+
+            qreal newY = (pos2.y()) - sin(lAngle) * (elemSize / 2);
+            qreal newX = (pos2.x()) + cos(lAngle) * (elemSize / 2);
+            line = QLineF(QPointF(newX, newY), pos1);
+
+            QGraphicsLineItem* gLine = scene->addLine(pos1.x(), pos1.y(), newX, newY, myPen);
+
+
+            double angle = ::acos(line.dx() / line.length());
+            if (line.dy() >= 0) {
+                angle = (Pi * 2) - angle;
+            }
+            QPointF arrowP1 = line.p1() + QPointF(sin(angle + Pi / 3) * arrowSize,
+                                                  cos(angle + Pi / 3) * arrowSize);
+            QPointF arrowP2 = line.p1() + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
+                                                  cos(angle + Pi - Pi / 3) * arrowSize);
+            QPolygonF arrowHead;
+            arrowHead << line.p1() << arrowP1 << arrowP2;
+            scene->addPolygon(arrowHead, myPen, blackBrush);
+        });
+    });
+=======
+    PlanWindow *pw = new PlanWindow(this);
+    pw->show();
+    pw->raise();
+>>>>>>> 6824b06aa82ecb71f2cc4764ba4cba73c26a8a49
+}
