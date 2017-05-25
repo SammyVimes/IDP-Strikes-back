@@ -230,9 +230,8 @@ void MainWindow::on_createPlanPushButton_clicked()
 
     MedsProcess* meds = new MedsProcess(0);
     meds->setPills(pillVec);
-    //vector<QString> fd = this->ui->forbiddenLineEdit->text().split(",").toVector().toStdVector();
-    //meds->setRejectedFood(fd);
-    meds->setRejectedFood({"Мука", "Яйца", "Картошка"});
+    vector<QString> fd = this->ui->forbiddenLineEdit->text().split(",").toVector().toStdVector();
+    meds->setRejectedFood(fd);
     CookingProcess *cooking = new CookingProcess(2);
 
     //выпилить говно

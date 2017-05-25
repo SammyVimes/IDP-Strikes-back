@@ -4,6 +4,9 @@
 QString PlanFilesManager::getNextFileNameAvailable()
 {
     QStringList list = PlanFilesManager::getPlanList();
+    if (list.isEmpty()) {
+        return "plan1.mdp";
+    }
     list.sort();
     QString res = list.last();
     res.chop(4);
