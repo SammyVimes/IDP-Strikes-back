@@ -30,7 +30,8 @@ PlanWindow::PlanWindow(Plan *plan, QWidget *parent) :
     stringstream ss;
     plan->serialize(ss);
 
-    QString filename = PlanFilesManager::getNextFileNameAvailable();
+    QString filename = "plan_" + plan->getName() + ".mdp";
+    //QString filename = PlanFilesManager::getNextFileNameAvailable();
     QFile file( filename );
     if ( file.open(QIODevice::ReadWrite) )
     {

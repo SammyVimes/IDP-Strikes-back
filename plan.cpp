@@ -35,12 +35,12 @@ void Plan::setFoodChangeThreshold(int value)
     foodChangeThreshold = value;
 }
 
-int Plan::getBirthTimestamp() const
+quint64 Plan::getBirthTimestamp() const
 {
     return birthTimestamp;
 }
 
-void Plan::setBirthTimestamp(int value)
+void Plan::setBirthTimestamp(quint64 value)
 {
     birthTimestamp = value;
 }

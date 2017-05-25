@@ -359,7 +359,7 @@ void MainWindow::on_createPlanPushButton_clicked()
 
     Plan* plan = new Plan();
     plan->setGraph(dfd);
-    plan->setBirthTimestamp(100);
+    plan->setBirthTimestamp(QDateTime::fromString(ui->birthDateEdit->text()).toMSecsSinceEpoch());
     plan->setName(ui->fioLineEdit->text());
     plan->setFoodChangeThreshold(boreTime);
     plan->setDays(planForDays);

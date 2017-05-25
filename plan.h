@@ -27,8 +27,8 @@ public:
     int getFoodChangeThreshold() const;
     void setFoodChangeThreshold(int value);
 
-    int getBirthTimestamp() const;
-    void setBirthTimestamp(int value);
+    quint64 getBirthTimestamp() const;
+    void setBirthTimestamp(quint64 value);
 
     QString getName() const;
     void setName(const QString &value);
