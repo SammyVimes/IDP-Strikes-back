@@ -52,6 +52,7 @@ void StartDialog::on_createPushButton_clicked()
     this->parentWidget()->show();
     this->parentWidget()->raise();
     this->hide();
+    reloadPlans();
     validate();
 }
 
@@ -65,6 +66,7 @@ void StartDialog::on_deletePushButton_clicked()
             QMessageBox::information(this, "Ошибка", "Ошибка при удалении " + f.fileName(), QMessageBox::Ok);
         }
     }
+    reloadPlans();
 }
 
 void StartDialog::on_helpPushButton_clicked()
