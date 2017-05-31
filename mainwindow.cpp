@@ -35,13 +35,6 @@ void MainWindow::validate()
         return;
     }
 
-    //TODO не используется
-    if (ui->birthDateEdit->date() < QDate(1940, 1, 1)) {
-        ui->statusBar->showMessage("Дата введена неверно.");
-        ui->createPlanPushButton->setEnabled(false);
-        return;
-    }
-
     if (ui->forbiddenLineEdit->text().split(",").size() < 2) {
         ui->statusBar->showMessage("Введите хотя бы 2 запрещённых продукта");
         ui->createPlanPushButton->setEnabled(false);
@@ -164,40 +157,6 @@ void MainWindow::closeEvent(QCloseEvent *e)
     }
 }
 
-
-
-struct ProcessingFood {
-
-    Food food;
-    int restPortions;
-    int restTime;
-    int lastEatingProcess;
-
-    ProcessingFood(Food foodValue) {
-        food = foodValue;
-        restPortions = foodValue.amount();
-        restTime = foodValue.expirationDate() * 3;
-
-        // указываем на cooking process
-        lastEatingProcess = 1;
-    }
-
-    ProcessingFood(const ProcessingFood& pFood) {
-        this->food = pFood.food;
-        this->restPortions = pFood.restPortions;
-        this->restTime = pFood.restTime;
-        this->lastEatingProcess = pFood.lastEatingProcess;
-    }
-
-};
-
-struct FoodComputer {
-    vector<ProcessingFood> idlingFood;
-    ProcessingFood* currentFood = nullptr;
-    int boringTime;
-    QString lastBoredFood;
-};
-
 void MainWindow::on_createPlanPushButton_clicked()
 {
     vector<Food> foodVec;
@@ -243,7 +202,7 @@ void MainWindow::on_createPlanPushButton_clicked()
     DirectedGraph<DFDElement*>* dfd = new DirectedGraph<DFDElement*>;
 
     DNode* medsNode = dfd->addNode(meds);
-    DNode* cookingNode = dfd->addNode(cooking);
+    dfd->addNode(cooking);
 
     int planForDays = ui->scheduleDaysSpinBox->value();
 
@@ -410,8 +369,6 @@ void MainWindow::addPill(Pill p)
 
 void MainWindow::checkXMLPresent()
 {
-    //TODO Get pills and food from pills.xml and food.xml
-    //TODO Use addPill() and addFood() to add objects
     QFile pfile("pills.mdp");
     QFileInfo fi(pfile);
     if (!pfile.open(QIODevice::ReadOnly))

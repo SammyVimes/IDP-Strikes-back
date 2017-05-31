@@ -53,4 +53,36 @@ private:
     void checkXMLPresent();
 };
 
+struct ProcessingFood {
+
+    Food food;
+    int restPortions;
+    int restTime;
+    int lastEatingProcess;
+
+    ProcessingFood(Food foodValue) {
+        food = foodValue;
+        restPortions = foodValue.amount();
+        restTime = foodValue.expirationDate() * 3;
+
+        // указываем на cooking process
+        lastEatingProcess = 1;
+    }
+
+    ProcessingFood(const ProcessingFood& pFood) {
+        this->food = pFood.food;
+        this->restPortions = pFood.restPortions;
+        this->restTime = pFood.restTime;
+        this->lastEatingProcess = pFood.lastEatingProcess;
+    }
+
+};
+
+struct FoodComputer {
+    vector<ProcessingFood> idlingFood;
+    ProcessingFood* currentFood = nullptr;
+    int boringTime;
+    QString lastBoredFood;
+};
+
 #endif // MAINWINDOW_H
