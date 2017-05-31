@@ -24,8 +24,9 @@ void StartDialog::reloadPlans()
     this->ui->listWidget->clear();
     this->ui->listWidget->addItems(qsl);
     if (qsl.size() > 0) {
-        QModelIndex modelIndex = this->ui->listWidget->rootIndex();
-        this->ui->listWidget->setCurrentIndex(modelIndex);
+        QModelIndex modelIndex = this->ui->listWidget->model()->index(0, 0);
+        this->ui->listWidget->selectionModel()->select(modelIndex, QItemSelectionModel::Select);
+        //this->ui->listWidget->setCurrentIndex(modelIndex);
     }
 }
 
@@ -39,7 +40,9 @@ void StartDialog::validate()
 
 void StartDialog::on_openPushButton_clicked()
 {
-    std::ifstream is(this->ui->listWidget->currentItem()->text().toStdString());
+    std::ifstream is;
+    string file = this->ui->listWidget->currentItem()->text().toStdString();
+    is.open(file);
     Plan *p = Plan::deserialize(is);
     PlanWindow *pw = new PlanWindow(p, this);
     pw->show();

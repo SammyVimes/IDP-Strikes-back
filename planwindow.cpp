@@ -22,7 +22,6 @@ PlanWindow::PlanWindow(Plan *plan, QWidget *parent) :
 
     this->plan = plan;
 
-
     // отрисуем
     drawDFD(true);
 
@@ -291,7 +290,7 @@ void PlanWindow::drawDFD(bool rebuildMap)
             line = QLineF(pos2, pos1);
 
 
-            QGraphicsLineItem* gLine = scene->addLine(pos1.x(), pos1.y(), pos2.x(), pos2.y(), myPen);
+            scene->addLine(pos1.x(), pos1.y(), pos2.x(), pos2.y(), myPen);
 
 
             QBrush blackBrush(Qt::black);

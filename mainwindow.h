@@ -26,9 +26,8 @@ public:
     ~MainWindow();
 
     void getPillList(QList<Pill *> &ptoOut);
-    
     void getFoodList(QList<Food *> &ftoOut);
-    
+    QString fillTimesForPill(Pill *from);
 public slots:
     void validate();
     void showHelp();
@@ -51,6 +50,7 @@ private:
     AddFoodDialog *afd = nullptr;
     CheckBoxFabric *cbf = nullptr;
     void checkXMLPresent();
+    void serializeArtifacts(bool &errFlag);
 };
 
 struct ProcessingFood {

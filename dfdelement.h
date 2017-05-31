@@ -16,7 +16,7 @@ public:
         this->type = -1;
     }
 
-    inline int getType() {
+    int getType() {
         return this->type;
     }
 

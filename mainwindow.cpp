@@ -90,9 +90,8 @@ void MainWindow::getFoodList(QList<Food *> &ftoOut)
     }
 }
 
-void MainWindow::closeEvent(QCloseEvent *e)
+void MainWindow::serializeArtifacts(bool &errFlag)
 {
-    bool errFlag = false;
     QList<Food *> ftoOut;
     getFoodList(ftoOut);
 
@@ -138,6 +137,12 @@ void MainWindow::closeEvent(QCloseEvent *e)
     } else {
         errFlag = true;
     }
+}
+
+void MainWindow::closeEvent(QCloseEvent *e)
+{
+    bool errFlag = false;
+    serializeArtifacts(errFlag);
 
     if (errFlag)
     {
@@ -434,15 +439,22 @@ void MainWindow::refreshFoodDesc()
     this->ui->foodPlainTextEdit->setPlainText(desc);
 }
 
+QString MainWindow::fillTimesForPill(Pill *from)
+{
+    QString times = "";
+    // включаем 3 последних бита соответственно на приём пищи
+    times += (from->takeTimeMask() & 0b100 != 0) ? " завтрак" : "";
+    times += (from->takeTimeMask() & 0b010 != 0) ? " обед" : "";
+    times += (from->takeTimeMask() & 0b001 != 0) ? " ужин" : "";
+    return times;
+}
+
 void MainWindow::refreshPillDesc()
 {
     QCheckBox *cb = (QCheckBox *) sender();
     Pill *from = (Pill *) cb->property("val").value<void *>();
     QString time = (from->beforeFlag()) ? "перед" : "после";
-    QString times = "";
-    times += (from->takeTimeMask() & 0b100 != 0) ? " завтрак" : "";
-    times += (from->takeTimeMask() & 0b010 != 0) ? " обед" : "";
-    times += (from->takeTimeMask() & 0b001 != 0) ? " ужин" : "";
+    QString times = fillTimesForPill(from);
     QString desc = "Название: " + from->name() +
             "\nУпотреблять: " + time + times +
             "\nВ течении: " + QString::number(from->getLifeTime()) + " дней";
