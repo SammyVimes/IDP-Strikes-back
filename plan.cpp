@@ -159,7 +159,7 @@ Plan* Plan::deserialize(istream &is)
     QString qStr = QString::fromStdString(str);
     Plan* plan = new Plan();
     QDomDocument domDoc;
-    if(domDoc.setContent(qStr)) {
+    if (domDoc.setContent(qStr)) {
         QDomElement domElement = domDoc.documentElement();
         QDomNode planElement = domElement.firstChild();
         while (!planElement.isNull()) {

@@ -26,9 +26,8 @@ public:
     ~MainWindow();
 
     void getPillList(QList<Pill *> &ptoOut);
-    
     void getFoodList(QList<Food *> &ftoOut);
-    
+    QString fillTimesForPill(Pill *from);
 public slots:
     void validate();
     void showHelp();
@@ -51,6 +50,39 @@ private:
     AddFoodDialog *afd = nullptr;
     CheckBoxFabric *cbf = nullptr;
     void checkXMLPresent();
+    void serializeArtifacts(bool &errFlag);
+};
+
+struct ProcessingFood {
+
+    Food food;
+    int restPortions;
+    int restTime;
+    int lastEatingProcess;
+
+    ProcessingFood(Food foodValue) {
+        food = foodValue;
+        restPortions = foodValue.amount();
+        restTime = foodValue.expirationDate() * 3;
+
+        // указываем на cooking process
+        lastEatingProcess = 1;
+    }
+
+    ProcessingFood(const ProcessingFood& pFood) {
+        this->food = pFood.food;
+        this->restPortions = pFood.restPortions;
+        this->restTime = pFood.restTime;
+        this->lastEatingProcess = pFood.lastEatingProcess;
+    }
+
+};
+
+struct FoodComputer {
+    vector<ProcessingFood> idlingFood;
+    ProcessingFood* currentFood = nullptr;
+    int boringTime;
+    QString lastBoredFood;
 };
 
 #endif // MAINWINDOW_H

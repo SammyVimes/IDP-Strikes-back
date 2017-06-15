@@ -114,7 +114,7 @@ public:
             return this->nodeId;
         }
 
-        inline int setId(int value) {
+        inline void setId(int value) {
             this->nodeId = value;
         }
 
@@ -352,62 +352,57 @@ class NodeManipulator
     NodePtr nodePointer;
   };
 
-template<typename V2>
-std::ostream& operator<< (std::ostream& os, const NodeManipulator<V2>& dt)
-{
-  typedef typename DirectedGraph<V2>::Node NODE;
-  if(!dt.nodePointer) return os;
-
-  auto outgoingNodes = dt.nodePointer->getOutgoingNodes();
-
-  auto node = dt.nodePointer;
-  os << QString("<node><id>").append(QString::number(node->getId())).append("</id><connections>").toStdString();
-
-  std::for_each (outgoingNodes.begin(), outgoingNodes.end(), [&node, &os](NODE* i)
-  {
-      os << "<id>" << std::to_string(i->getId()) << "</id>"  << endl;
-  });
-
-  os << "</connections></node>" << endl;
-
-  return os;
-}
-
-template <typename V2>
-std::ostream& operator<< (std::ostream& os, const DirectedGraph<V2>& dt) {
-    typedef typename DirectedGraph<V2>::Node NODE;
-    size_t edgesCounter = 0;
-
-    os << "<graph>" << endl;
-
-    os << "<nodes>" << endl;
-
-    std::for_each (dt.nodes.begin(), dt.nodes.end(), [&os, &edgesCounter](NODE* i)
+    template<typename V2>
+    std::ostream& operator<< (std::ostream& os, const NodeManipulator<V2>& dt)
     {
-        string x =  QString("<node><id>").append(QString::number(i->getId())).append("</id><value>").toStdString();
-        os << x << endl ;
-        os << i->getValue();
-        os << "</value></node>";
-    });
+      typedef typename DirectedGraph<V2>::Node NODE;
+      if(!dt.nodePointer) return os;
 
-    os << "</nodes>" << endl;
+      auto outgoingNodes = dt.nodePointer->getOutgoingNodes();
 
-    os << "<outgoing>" << endl;
-    std::for_each (dt.nodes.begin(), dt.nodes.end(), [&os](NODE* i)
-    {
-        os << NodeManipulator<V2>(i);
-    });
-    os << "</outgoing>" << endl;
+      auto node = dt.nodePointer;
+      os << QString("<node><id>").append(QString::number(node->getId())).append("</id><connections>").toStdString();
 
-    os << "</graph>" << endl;
+      std::for_each (outgoingNodes.begin(), outgoingNodes.end(), [&node, &os](NODE* i)
+      {
+          os << "<id>" << std::to_string(i->getId()) << "</id>"  << endl;
+      });
 
-    return os;
-}
+      os << "</connections></node>" << endl;
 
-template <typename V2>
-std::istream& operator>> (std::istream& is, DirectedGraph<V2>& dt) {
+      return os;
+    }
 
-}
+    template <typename V2>
+    std::ostream& operator<< (std::ostream& os, const DirectedGraph<V2>& dt) {
+        typedef typename DirectedGraph<V2>::Node NODE;
+        size_t edgesCounter = 0;
+
+        os << "<graph>" << endl;
+
+        os << "<nodes>" << endl;
+
+        std::for_each (dt.nodes.begin(), dt.nodes.end(), [&os, &edgesCounter](NODE* i)
+        {
+            string x =  QString("<node><id>").append(QString::number(i->getId())).append("</id><value>").toStdString();
+            os << x << endl ;
+            os << i->getValue();
+            os << "</value></node>";
+        });
+
+        os << "</nodes>" << endl;
+
+        os << "<outgoing>" << endl;
+        std::for_each (dt.nodes.begin(), dt.nodes.end(), [&os](NODE* i)
+        {
+            os << NodeManipulator<V2>(i);
+        });
+        os << "</outgoing>" << endl;
+
+        os << "</graph>" << endl;
+
+        return os;
+    }
 }
 
 #endif // DIRECTEDGRAPH_H
