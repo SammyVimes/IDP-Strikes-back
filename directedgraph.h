@@ -5,38 +5,21 @@
 #include "exception.h"
 #include <iomanip>
 #include <QtXml>
+#include <signal.h>
 
 using namespace std;
 
-class NullPointerException;
+class IteratorNullElementException;
 
-#define THROW_DG_NULL_POINTER_EXCEPTION(s) throw NullPointerException(s, __LINE__, __FUNCTION__, __TIMESTAMP__)
+#define THROW_DG_ITERATOR_LAST_ELEMENT_EXCEPTION() throw IteratorNullElementException(__LINE__, __FUNCTION__, __TIMESTAMP__)
 
-#define THROW_DG_ALLOCATOR_EXCEPTION(s) throw AllocatorException(s, __LINE__, __FUNCTION__, __TIMESTAMP__)
+#define THROW_DG_ALLOCATOR_EXCEPTION() throw AllocatorException(__LINE__, __FUNCTION__, __TIMESTAMP__)
 
-class BadGraphException {
-
-private:
-
-    std::string message;
-
-public:
-
-    BadGraphException(std::string message) {
-        this->message = message;
-    }
-
-    std::string getMessage() {
-        return message;
-    }
-
-};
-
-class NullPointerException: public Exception
+class IteratorNullElementException: public Exception
  {
  public:
-   NullPointerException(std::string text, int line, std::string function, std::string timestamp):
-     Exception(text, line, function, timestamp)
+   IteratorNullElementException(int line, std::string function, std::string timestamp):
+     Exception(line, function, timestamp)
    {
    }
  };
@@ -44,14 +27,20 @@ class NullPointerException: public Exception
 class AllocatorException: public Exception
  {
  public:
-   AllocatorException(std::string text, int line, std::string function, std::string timestamp):
-     Exception(text, line, function, timestamp)
+   AllocatorException(int line, std::string function, std::string timestamp):
+     Exception(line, function, timestamp)
    {
    }
  };
 
 
 namespace MDP {
+
+template <class V>
+class NodesEqualException;
+template <class V>
+class NodeDoesntBelongException;
+
 template <class V>
 class DirectedGraph
 {
@@ -166,17 +155,7 @@ public:
     Allocator alloc;
 
 public:
-    Node* addNode(Node* from, const V& value) throw(BadGraphException) {
-        if (from->getGraph() != this) {
-            throw BadGraphException("Node 'from' doesn't belong to this graph");
-        }
-
-        Node* n = new Node(this, value, ++lastId);
-        from->addOutgoingNode(n);
-
-        this->nodes.push_back(n);
-        return n;
-    }
+    Node* addNode(Node* from, const V& value) throw(NodeDoesntBelongException<V>);
 
     template <typename V2>
     friend std::ostream& operator<< (std::ostream& os, const DirectedGraph<V2>& dt);
@@ -196,19 +175,7 @@ public:
         return true;
     }
 
-    void linkNodes(Node* nodeFrom, Node* nodeTo) {
-        if (nodeFrom == nodeTo) {
-            throw BadGraphException("Node 'from' and 'to' equals");
-        }
-        if (nodeFrom->getGraph() != this) {
-            throw BadGraphException("Node 'from' doesn't belong to this graph");
-        }
-        if (nodeTo->getGraph() != this) {
-            throw BadGraphException("Node 'to' doesn't belong to this graph");
-        }
-
-        nodeFrom->addOutgoingNode(nodeTo);
-    }
+    void linkNodes(Node* nodeFrom, Node* nodeTo) throw(NodeDoesntBelongException<V>, NodesEqualException<V>);
 
     Node* addNode(const V& value) {
         Node* n = new Node(this, value, ++lastId);
@@ -227,6 +194,99 @@ private:
     int lastId = 0;
 
 };
+
+template <class V>
+class NodesEqualException {
+
+
+private:
+
+    typedef typename DirectedGraph<V>::Node* NodePtr;
+    NodePtr node;
+
+public:
+
+    NodesEqualException(NodePtr node) {
+        this->node = node;
+    }
+
+
+    NodePtr getNode() const
+    {
+        return node;
+    }
+};
+
+template <class V>
+class NodeDoesntBelongException {
+
+
+private:
+
+    typedef typename DirectedGraph<V>::Node* NodePtr;
+    typedef DirectedGraph<V>* GraphPtr;
+    NodePtr node;
+    GraphPtr graph;
+    GraphPtr actualGraph;
+
+
+public:
+
+    NodeDoesntBelongException(NodePtr node, GraphPtr graph, GraphPtr actualGraph) {
+        this->node = node;
+        this->graph = graph;
+        this->actualGraph = actualGraph;
+    }
+
+    NodePtr getNode() const
+    {
+        return node;
+    }
+
+    GraphPtr getGraph() const
+    {
+        return graph;
+    }
+
+    GraphPtr getActualGraph() const
+    {
+        return actualGraph;
+    }
+
+};
+
+
+template<class V>
+void DirectedGraph<V>::linkNodes(DirectedGraph<V>::Node *nodeFrom, DirectedGraph<V>::Node *nodeTo)  throw(NodeDoesntBelongException<V>, NodesEqualException<V>)
+{
+    if (nodeFrom == nodeTo) {
+        throw NodesEqualException<V>(nodeFrom);
+    }
+    if (nodeFrom->getGraph() != this) {
+        throw NodeDoesntBelongException<V>(nodeFrom, this, nodeFrom->getGraph());
+    }
+    if (nodeTo->getGraph() != this) {
+        throw NodeDoesntBelongException<V>(nodeTo, this, nodeTo->getGraph());
+    }
+
+    nodeFrom->addOutgoingNode(nodeTo);
+}
+
+
+template<class V>
+typename DirectedGraph<V>::Node *DirectedGraph<V>::addNode(DirectedGraph<V>::Node *from, const V &value) throw(NodeDoesntBelongException<V>)
+{
+    if (from->getGraph() != this) {
+        throw NodeDoesntBelongException<V>(from);
+    }
+
+    Node* n = new Node(this, value, ++lastId);
+    from->addOutgoingNode(n);
+
+    this->nodes.push_back(n);
+    return n;
+}
+
 
 template<class V> inline
   DirectedGraph<V>::NodeIterator::NodeIterator(const DirectedGraph<V>::NodeIterator &iterator)
@@ -251,7 +311,8 @@ template<class V> inline
   {
     if(_vertexP->size() < (_position + 1))
     {
-      THROW_DG_NULL_POINTER_EXCEPTION("Null pointer exception, icrement > MultiGraph-vertexes-size!");
+//      THROW_DG_ITERATOR_LAST_ELEMENT_EXCEPTION("Null pointer exception, icrement > MultiGraph-vertexes-size!");
+      THROW_DG_ITERATOR_LAST_ELEMENT_EXCEPTION();
       return *this;
     }
     _position++;
@@ -264,7 +325,8 @@ template<class V> inline
   {
     if(_vertexP->size() < (_position + k))
     {
-      THROW_DG_NULL_POINTER_EXCEPTION("Null pointer exception, icrement > MultiGraph-vertexes-size!");
+//      THROW_DG_ITERATOR_LAST_ELEMENT_EXCEPTION("Null pointer exception, icrement > MultiGraph-vertexes-size!");
+      THROW_DG_ITERATOR_LAST_ELEMENT_EXCEPTION();
       return *this;
     }
     _position += k;
@@ -289,7 +351,8 @@ template<class V> inline
   {
     if(_position == _vertexP->size())
     {
-      THROW_DG_NULL_POINTER_EXCEPTION("Null pointer exception, Try access to last NULL element!");
+//      THROW_DG_ITERATOR_LAST_ELEMENT_EXCEPTION("Null pointer exception, Try access to last NULL element!");
+      THROW_DG_ITERATOR_LAST_ELEMENT_EXCEPTION();
       return nullptr;
     }
     return *_vertexIterator;
@@ -316,7 +379,8 @@ void DirectedGraph<V>::Allocator::returnNode(DirectedGraph<V>::Node *node)
 
   if(pos == nodesPool.end())
   {
-    THROW_DG_ALLOCATOR_EXCEPTION("can't find returned value in nodes pool!");
+//    THROW_DG_ALLOCATOR_EXCEPTION("can't find returned value in nodes pool!");
+    THROW_DG_ALLOCATOR_EXCEPTION();
     return;
   }
 
@@ -403,6 +467,9 @@ class NodeManipulator
 
         return os;
     }
+
+
+
 }
 
 #endif // DIRECTEDGRAPH_H

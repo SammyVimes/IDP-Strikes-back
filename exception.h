@@ -9,13 +9,12 @@ class Exception : public std::exception
 {
 public:
   Exception();
-  Exception(std::string text, int line, std::string function, std::string timestamp);
+  Exception(int line, std::string function, std::string timestamp);
 
   virtual const char* what() const throw();
 
 
 private:
-  std::string text;
   int line;
   std::string function;
   std::string timestamp;

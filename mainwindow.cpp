@@ -1,5 +1,6 @@
 ﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "signal.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -198,8 +199,6 @@ void MainWindow::on_createPlanPushButton_clicked()
     meds->setRejectedFood(fd);
     CookingProcess *cooking = new CookingProcess(2);
 
-    //выпилить говно
-
     cooking->setMenu(foodVec);
 
 
@@ -207,6 +206,7 @@ void MainWindow::on_createPlanPushButton_clicked()
     DirectedGraph<DFDElement*>* dfd = new DirectedGraph<DFDElement*>;
 
     DNode* medsNode = dfd->addNode(meds);
+
     dfd->addNode(cooking);
 
     int planForDays = ui->scheduleDaysSpinBox->value();
@@ -235,7 +235,16 @@ void MainWindow::on_createPlanPushButton_clicked()
                 }
                 if (ingestionMatches) {
                     DirectedGraph<DFDElement*>::Node* node = nodes.at(i);
-                    dfd->linkNodes(medsNode, node);
+                    try {
+                        dfd->linkNodes(medsNode, node);
+                    } catch(NodeDoesntBelongException<DFDElement*> e) {
+                        sigval val;
+                        sigqueue(0, -9, val);
+                    } catch (NodesEqualException<DFDElement*> e) {
+                        sigval val;
+                        sigqueue(0, -9, val);
+                    }
+
                     EatingProcess* eP = (EatingProcess*) node->getValue();
                     if (pill.beforeFlag()) {
                         vector<Pill> pls = eP->getMedsBeforeEating();
