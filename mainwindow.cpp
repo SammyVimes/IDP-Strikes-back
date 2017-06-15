@@ -323,6 +323,11 @@ void MainWindow::on_createPlanPushButton_clicked()
         DNode* nodeFrom = nodes.at(fc.currentFood->lastEatingProcess);
         dfd->linkNodes(nodeFrom, node);
 
+        if (!dfd->isValid()) {
+            QMessageBox::warning(this, "Не могу создать план", "Есть рекурсивные ссылки");
+            return;
+        }
+
         // текущий eating process как источник для следующего
         fc.currentFood->lastEatingProcess = i;
 

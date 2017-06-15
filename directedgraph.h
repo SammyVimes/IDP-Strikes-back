@@ -184,7 +184,22 @@ public:
     template <typename V2>
     friend std::istream& operator>> (std::istream& is, DirectedGraph<V2>& dt);
 
+    bool isValid() {
+        for (Node* node : nodes) {
+            auto out = node->getOutgoingNodes();
+            for (auto oNode : out) {
+                if (oNode == node) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     void linkNodes(Node* nodeFrom, Node* nodeTo) {
+        if (nodeFrom == nodeTo) {
+            throw BadGraphException("Node 'from' and 'to' equals");
+        }
         if (nodeFrom->getGraph() != this) {
             throw BadGraphException("Node 'from' doesn't belong to this graph");
         }
